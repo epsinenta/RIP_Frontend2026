@@ -1,0 +1,24 @@
+.departments-page__main {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.departments-page__main .cart-row {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  padding-left: 22px;
+  box-sizing: border-box;
+}
+
+.departments-page__grid {
+  min-height: 120px;
+  padding-bottom: 24px;
+}
+
+.departments-page__empty {
+  padding: 16px 0;
+  color: #555;
+}
