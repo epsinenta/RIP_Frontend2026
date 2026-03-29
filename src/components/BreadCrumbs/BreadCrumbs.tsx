@@ -1,39 +1,84 @@
-import "./BreadCrumbs.css";
-import React from "react";
-import { Link } from "react-router-dom";
-import { type FC } from "react";
+import { useEffect, useState } from "react";
+import { Link, matchPath, useLocation } from "react-router-dom";
+import { getDepartment } from "../../modules/departmentsApi";
+import { DEPARTMENTS_MOCK } from "../../modules/mock";
 import { ROUTES } from "../../Routes";
+import "./Breadcrumbs.css";
 
-interface ICrumb {
-  label: string;
-  path?: string;
-}
+type Crumb = { label: string; to?: string };
 
-interface BreadCrumbsProps {
-  crumbs: ICrumb[];
-}
+export default function Breadcrumbs() {
+  const { pathname } = useLocation();
+  const [departmentTitle, setDepartmentTitle] = useState<string | null>(null);
 
-export const BreadCrumbs: FC<BreadCrumbsProps> = (props) => {
-  const { crumbs } = props;
+  useEffect(() => {
+    const m = matchPath(ROUTES.DEPARTMENT, pathname);
+    const rawId = m?.params.id;
+    if (rawId == null) {
+      setDepartmentTitle(null);
+      return;
+    }
+    const id = Number(rawId);
+    let cancelled = false;
+    void getDepartment(id).then((d) => {
+      if (cancelled) return;
+      if (d) setDepartmentTitle(d.title);
+      else {
+        const mock = DEPARTMENTS_MOCK.find((x) => x.department_id === id);
+        setDepartmentTitle(mock?.title ?? `Департамент ${id}`);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [pathname]);
+
+  const crumbs: Crumb[] = (() => {
+    if (pathname === "/" || pathname === "") {
+      return [{ label: "Главная" }];
+    }
+
+    const deptMatch = matchPath(ROUTES.DEPARTMENT, pathname);
+    if (deptMatch?.params.id) {
+      const title =
+        departmentTitle ?? (deptMatch.params.id ? `Департамент ${deptMatch.params.id}` : "Департамент");
+      return [{ label: "Главная", to: "/" }, { label: title }];
+    }
+
+    const appMatch = matchPath(ROUTES.DEPARTMENT_APPLICATION, pathname);
+    if (appMatch?.params.id) {
+      return [
+        { label: "Главная", to: "/" },
+        { label: `Заявка №${appMatch.params.id}` },
+      ];
+    }
+
+    return [{ label: "Главная", to: "/" }, { label: "Страница" }];
+  })();
 
   return (
-    <ul className="breadcrumbs">
-      <li>
-        <Link to={ROUTES.DEPARTMENTS}>Структура</Link>
-      </li>
-      {!!crumbs.length &&
-        crumbs.map((crumb, index) => (
-          <React.Fragment key={index}>
-            <li className="slash">/</li>
-            {index === crumbs.length - 1 ? (
-              <li>{crumb.label}</li>
-            ) : (
-              <li>
-                <Link to={crumb.path || ""}>{crumb.label}</Link>
-              </li>
-            )}
-          </React.Fragment>
-        ))}
-    </ul>
+    <nav className="app-breadcrumbs" aria-label="Навигационная цепочка">
+      <ol className="app-breadcrumbs__list">
+        {crumbs.map((crumb, i) => {
+          const last = i === crumbs.length - 1;
+          return (
+            <li key={`${crumb.label}-${i}`} className="app-breadcrumbs__item">
+              {crumb.to != null && !last ? (
+                <Link to={crumb.to} className="app-breadcrumbs__link">
+                  {crumb.label}
+                </Link>
+              ) : (
+                <span
+                  className={last ? "app-breadcrumbs__current" : undefined}
+                  aria-current={last ? "page" : undefined}
+                >
+                  {crumb.label}
+                </span>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
   );
-};
+}

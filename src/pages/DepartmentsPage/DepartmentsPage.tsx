@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Header from "../../components/Header/Header";
 import Search from "../../components/InputField/InputField";
 import DepartmentsList from "../../components/DepartmentsList/DepartmentsList";
 import CartRow from "../../components/CartRow/CartRow";
@@ -65,7 +64,6 @@ export default function DepartmentsPage() {
 
   return (
     <div className="departments-page">
-      <Header />
       <Search query={searchTitle} onQueryChange={setSearchTitle} onSearch={handleSearch} />
       <div className="space">
         <main className="departments-page__main">

@@ -13,7 +13,6 @@ import {
 } from "../../modules/departmentsApi";
 import { DEPARTMENTS_MOCK, MOCK_APPLICATION_DETAIL } from "../../modules/mock";
 import { Spinner } from "react-bootstrap";
-import Header from "../../components/Header/Header";
 import "./DepartmentApplicationPage.css";
 
 const ROLE_OPTIONS = ["Головной", "Руководящий", "Подчинённый"] as const;
@@ -130,7 +129,6 @@ export default function DepartmentApplicationPage() {
   if (loading) {
     return (
       <div className="department-application-page">
-        <Header variant="center" />
         <div className="device-page-loader">
           <Spinner animation="border" />
         </div>
@@ -141,7 +139,6 @@ export default function DepartmentApplicationPage() {
   if (!data) {
     return (
       <div className="department-application-page">
-        <Header variant="center" />
         <p className="application-not-found">Заявка не найдена.</p>
       </div>
     );
@@ -151,7 +148,6 @@ export default function DepartmentApplicationPage() {
 
   return (
     <div className="department-application-page">
-      <Header variant="center" />
       <div className="application-detail">
         <div className="application-detail__header-card">
           <h1 className="application-detail__title">Заявка на объединение департаментов</h1>

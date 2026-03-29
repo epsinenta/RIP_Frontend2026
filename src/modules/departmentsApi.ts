@@ -2,9 +2,6 @@ const MINIO_PUBLIC_BASE =
   (import.meta.env.VITE_MINIO_PUBLIC_BASE?.replace(/\/$/, "") as string | undefined) ??
   "http://localhost:9000/test";
 
-export const FALLBACK_IMAGE_KEY =
-  (import.meta.env.VITE_FALLBACK_IMAGE_KEY as string | undefined)?.trim() || "device_error.png";
-
 export interface Department {
   department_id: number;
   is_deleted: boolean;
@@ -57,7 +54,12 @@ export function objectUrlFromKey(key: string): string {
 }
 
 export function fallbackImageUrl(): string {
-  return objectUrlFromKey(FALLBACK_IMAGE_KEY);
+  return (
+    "data:image/svg+xml," +
+    encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="120" viewBox="0 0 200 120"><rect width="100%" height="100%" fill="#e8e8ec"/></svg>',
+    )
+  );
 }
 
 export async function getDepartmentApplicationCart(): Promise<DepartmentApplicationCart> {

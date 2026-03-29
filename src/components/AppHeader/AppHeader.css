@@ -1,0 +1,31 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fafafa;
+  min-height: 64px;
+  width: 100%;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  padding: 0 40px;
+  box-sizing: border-box;
+}
+
+.app-header__navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.app-header__logo {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.app-header__logo img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+}

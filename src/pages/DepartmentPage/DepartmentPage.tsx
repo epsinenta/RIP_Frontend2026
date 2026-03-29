@@ -8,7 +8,6 @@ import {
 } from "../../modules/departmentsApi";
 import type { Department } from "../../modules/departmentsApi";
 import { Spinner } from "react-bootstrap";
-import Header from "../../components/Header/Header";
 import { DEPARTMENTS_MOCK } from "../../modules/mock";
 import "./DepartmentPage.css";
 
@@ -78,7 +77,6 @@ export default function DepartmentPage() {
   if (loading) {
     return (
       <div className="vibes-page">
-        <Header variant="center" />
         <div className="device-page-loader">
           <Spinner animation="border" />
         </div>
@@ -89,7 +87,6 @@ export default function DepartmentPage() {
   if (!department) {
     return (
       <div className="vibes-page">
-        <Header variant="center" />
         <div className="department-not-found">
           <h1>Подразделение не найдено</h1>
         </div>
@@ -103,7 +100,6 @@ export default function DepartmentPage() {
 
   return (
     <div className="vibes-page">
-      <Header variant="center" />
       <div className="vibes-viewport">
         <div className="vibes-media">
           {showVideo ? (
