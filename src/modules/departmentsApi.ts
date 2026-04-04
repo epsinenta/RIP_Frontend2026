@@ -15,6 +15,10 @@ export interface Department {
   short_description: string;
 }
 
+export function departmentClipDescription(d: Department): string {
+  return d.description.trim();
+}
+
 export interface DepartmentApplicationCart {
   has_draft: boolean;
   departments_count: number;

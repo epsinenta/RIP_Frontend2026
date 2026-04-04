@@ -1,4 +1,12 @@
 import { type Department, type DepartmentApplicationDetailResponse } from "./departmentsApi";
+import accountingPhoto from "../assets/accounting.jpg";
+import accountingVideo from "../assets/accounting.mp4";
+import hrPhoto from "../assets/hr_department.jpg";
+import hrVideo from "../assets/hr_department.mp4";
+import itPhoto from "../assets/it_department.jpg";
+import itVideo from "../assets/it_department.mp4";
+import procurementPhoto from "../assets/procurement.jpg";
+import procurementVideo from "../assets/procurement.mp4";
 
 export const DEPARTMENTS_MOCK: Department[] = [
   {
@@ -7,11 +15,11 @@ export const DEPARTMENTS_MOCK: Department[] = [
     title: "Отдел разработки ПО",
     description:
       "Разработка и сопровождение внутренних информационных систем. Оклады руководителей и ведущих специалистов согласуются в заявках на изменение структуры.",
-    photo_url: "huawei.jpg",
+    photo_url: itPhoto,
     employee_count: 42,
     head: "Иванов И.И.",
     reports_to: "Директор по ИТ",
-    video: "dept-1.mp4",
+    video: itVideo,
     short_description: "Backend, frontend, DevOps и тестирование.",
   },
   {
@@ -20,11 +28,11 @@ export const DEPARTMENTS_MOCK: Department[] = [
     title: "Отдел продаж",
     description:
       "Работа с корпоративными клиентами и партнёрами. Премии и фиксированная часть зарплаты отражаются в кадровых заявках.",
-    photo_url: "phone.jpg",
+    photo_url: procurementPhoto,
     employee_count: 28,
     head: "Петрова А.С.",
     reports_to: "Коммерческий директор",
-    video: "dept-2.mp4",
+    video: procurementVideo,
     short_description: "B2B-продажи, сопровождение сделок.",
   },
   {
@@ -33,11 +41,11 @@ export const DEPARTMENTS_MOCK: Department[] = [
     title: "HR и обучение",
     description:
       "Подбор персонала, адаптация и корпоративное обучение. Ведётся учёт штатных единиц и бюджета ФОТ по отделам.",
-    photo_url: "tefal.jpg",
+    photo_url: hrPhoto,
     employee_count: 12,
     head: "Сидорова Е.В.",
     reports_to: "Генеральный директор",
-    video: "dept-3.mp4",
+    video: hrVideo,
     short_description: "Кадровый учёт и развитие сотрудников.",
   },
   {
@@ -46,11 +54,11 @@ export const DEPARTMENTS_MOCK: Department[] = [
     title: "Финансовый отдел",
     description:
       "Учёт, планирование и отчётность. Контроль выплат по зарплате и налогам в разрезе департаментов.",
-    photo_url: "krups.jpg",
+    photo_url: accountingPhoto,
     employee_count: 15,
     head: "Козлов Д.П.",
     reports_to: "Финансовый директор",
-    video: "dept-4.mp4",
+    video: accountingVideo,
     short_description: "Бюджетирование и контроль затрат.",
   },
 ];
