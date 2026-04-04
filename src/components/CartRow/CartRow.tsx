@@ -1,39 +1,30 @@
 import "./CartRow.css";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getDepartmentApplicationCart, objectUrlFromKey } from "../../modules/departmentsApi";
+import { MOCK_CART } from "../../modules/mock";
+import cartIcon from "../../assets/department.svg";
 
 export default function CartRow() {
-  const [count, setCount] = useState(0);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [applicationId, setApplicationId] = useState<number | undefined>();
+  const [cart, setCart] = useState(MOCK_CART);
 
   useEffect(() => {
-    const load = () => {
-      void getDepartmentApplicationCart().then((data) => {
-        setCount(data.departments_count);
-        setHasDraft(data.has_draft);
-        setApplicationId(data.id);
-      });
-    };
+    const load = () => setCart({ ...MOCK_CART });
     load();
     window.addEventListener("department-cart-updated", load);
     return () => window.removeEventListener("department-cart-updated", load);
   }, []);
 
-  const iconSrc = objectUrlFromKey("department.svg");
-
   const inner = (
     <>
-      <img src={iconSrc} alt="" className="cart-row__icon" />
-      <span className="cart-row__text">Отделов в заявке: {count}</span>
+      <img src={cartIcon} alt="" className="cart-row__icon" />
+      <span className="cart-row__text">Отделов в заявке: {cart.departments_count}</span>
     </>
   );
 
-  if (hasDraft && count > 0 && applicationId != null) {
+  if (cart.has_draft && cart.departments_count > 0 && cart.id != null) {
     return (
       <div className="cart-row">
-        <Link to={`/department_application/${applicationId}`} className="cart-row__link">
+        <Link to={`/department_application/${cart.id}`} className="cart-row__link">
           {inner}
         </Link>
       </div>

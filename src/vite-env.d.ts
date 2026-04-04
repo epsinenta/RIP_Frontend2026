@@ -5,10 +5,7 @@ declare module "*.mp4" {
   export default src;
 }
 
-interface ImportMetaEnv {
-  readonly VITE_MINIO_PUBLIC_BASE?: string
-}
-
-interface ImportMeta {
-  readonly env: ImportMetaEnv
+declare module "*.svg" {
+  const src: string;
+  export default src;
 }

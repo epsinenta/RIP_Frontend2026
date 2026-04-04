@@ -1,26 +1,18 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, type MouseEvent } from "react";
-import type { Department } from "../../modules/departmentsApi";
 import {
-  addDepartmentToApplication,
   fallbackImageUrl,
-  objectUrlFromKey,
+  resolveMediaUrl,
+  type Department,
 } from "../../modules/departmentsApi";
+import { addDepartmentToMockApplication } from "../../modules/mock";
 import "./DepartmentCard.css";
 
 const CART_UPDATED = "department-cart-updated";
 
 function resolvePhotoSrc(photo_url: string, imageError: boolean): string {
   if (imageError || !photo_url) return fallbackImageUrl();
-  if (
-    photo_url.startsWith("http://") ||
-    photo_url.startsWith("https://") ||
-    photo_url.startsWith("/") ||
-    photo_url.startsWith("blob:")
-  ) {
-    return photo_url;
-  }
-  return objectUrlFromKey(photo_url);
+  return resolveMediaUrl(photo_url);
 }
 
 export default function DepartmentCard({ department }: { department: Department }) {
@@ -43,11 +35,11 @@ export default function DepartmentCard({ department }: { department: Department 
     e.stopPropagation();
     setAdding(true);
     try {
-      const result = await addDepartmentToApplication(department.department_id);
+      const result = await addDepartmentToMockApplication(department.department_id);
       if (result.ok) {
         window.dispatchEvent(new Event(CART_UPDATED));
       } else {
-        window.alert(result.message ?? "Не удалось добавить отдел в заявку.");
+        window.alert("message" in result ? result.message : "Не удалось добавить отдел в заявку.");
       }
     } finally {
       setAdding(false);

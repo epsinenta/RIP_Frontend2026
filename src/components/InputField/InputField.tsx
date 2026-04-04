@@ -1,4 +1,6 @@
 import type React from "react";
+import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import "./InputField.css";
 
 interface SearchProps {
@@ -15,8 +17,8 @@ export default function Search({ query, onQueryChange, onSearch }: SearchProps) 
 
   return (
     <div className="search-bar">
-      <form onSubmit={handleSubmit} className="search-bar__form">
-        <input
+      <Form onSubmit={handleSubmit} className="search-bar__form">
+        <Form.Control
           type="text"
           name="query"
           className="search-input"
@@ -24,10 +26,10 @@ export default function Search({ query, onQueryChange, onSearch }: SearchProps) 
           value={query}
           onChange={(e) => onQueryChange(e.target.value)}
         />
-        <button type="submit" className="search-btn">
+        <Button type="submit" className="search-btn">
           Найти
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   );
 }

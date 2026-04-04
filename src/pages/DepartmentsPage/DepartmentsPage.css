@@ -22,3 +22,10 @@
   padding: 16px 0;
   color: #555;
 }
+
+.departments-page__loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px 0;
+  color: #c55f4d;
+}

@@ -1,62 +1,25 @@
 import { useEffect, useState } from "react";
+import Spinner from "react-bootstrap/Spinner";
 import Search from "../../components/InputField/InputField";
 import DepartmentsList from "../../components/DepartmentsList/DepartmentsList";
 import CartRow from "../../components/CartRow/CartRow";
-import { listDepartments } from "../../modules/departmentsApi";
 import type { Department } from "../../modules/departmentsApi";
-import { DEPARTMENTS_MOCK } from "../../modules/mock";
+import { DEPARTMENTS_MOCK, filterMockDepartmentsByTitle } from "../../modules/mock";
 import "./DepartmentsPage.css";
 
 export default function DepartmentsPage() {
-  const [departments, setDepartments] = useState<Department[]>([]);
+  const [departments, setDepartments] = useState<Department[]>(DEPARTMENTS_MOCK);
   const [searchTitle, setSearchTitle] = useState("");
   const [loading, setLoading] = useState(false);
-  const [useMock, setUseMock] = useState(false);
 
   useEffect(() => {
-    if (useMock) {
-      setDepartments(DEPARTMENTS_MOCK);
-    } else {
-      listDepartments()
-        .then((data) => {
-          if (data.length > 0) {
-            setDepartments(data);
-          } else {
-            setDepartments(DEPARTMENTS_MOCK);
-            setUseMock(true);
-          }
-        })
-        .catch(() => {
-          setDepartments(DEPARTMENTS_MOCK);
-          setUseMock(true);
-        });
-    }
-  }, [useMock]);
+    setDepartments(DEPARTMENTS_MOCK);
+  }, []);
 
-  const handleSearch = async () => {
+  const handleSearch = () => {
     setLoading(true);
     try {
-      const filtered = await listDepartments({ title: searchTitle });
-
-      if (filtered.length > 0) {
-        setDepartments(filtered);
-        setUseMock(false);
-      } else {
-        if (useMock) {
-          const filteredMock = DEPARTMENTS_MOCK.filter((d) =>
-            d.title.toLowerCase().includes(searchTitle.toLowerCase()),
-          );
-          setDepartments(filteredMock);
-        } else {
-          setDepartments([]);
-        }
-      }
-    } catch {
-      const filteredMock = DEPARTMENTS_MOCK.filter((d) =>
-        d.title.toLowerCase().includes(searchTitle.toLowerCase()),
-      );
-      setDepartments(filteredMock);
-      setUseMock(true);
+      setDepartments(filterMockDepartmentsByTitle(searchTitle));
     } finally {
       setLoading(false);
     }
@@ -69,7 +32,11 @@ export default function DepartmentsPage() {
         <main className="departments-page__main">
           <CartRow />
           {loading ? (
-            <div>Загрузка...</div>
+            <div className="departments-page__loading">
+              <Spinner animation="border" role="status" aria-label="Загрузка">
+                <span className="visually-hidden">Загрузка...</span>
+              </Spinner>
+            </div>
           ) : (
             <div className="services-grid departments-page__grid">
               {departments.length > 0 ? (

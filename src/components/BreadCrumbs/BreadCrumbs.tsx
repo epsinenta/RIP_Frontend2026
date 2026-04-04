@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, matchPath, useLocation } from "react-router-dom";
-import { getDepartment } from "../../modules/departmentsApi";
-import { DEPARTMENTS_MOCK } from "../../modules/mock";
+import { getMockDepartment } from "../../modules/mock";
 import { ROUTES } from "../../Routes";
 import "./Breadcrumbs.css";
 
@@ -19,18 +18,8 @@ export default function Breadcrumbs() {
       return;
     }
     const id = Number(rawId);
-    let cancelled = false;
-    void getDepartment(id).then((d) => {
-      if (cancelled) return;
-      if (d) setDepartmentTitle(d.title);
-      else {
-        const mock = DEPARTMENTS_MOCK.find((x) => x.department_id === id);
-        setDepartmentTitle(mock?.title ?? `Департамент ${id}`);
-      }
-    });
-    return () => {
-      cancelled = true;
-    };
+    const dep = getMockDepartment(id);
+    setDepartmentTitle(dep?.title ?? `Департамент ${id}`);
   }, [pathname]);
 
   const crumbs: Crumb[] = (() => {

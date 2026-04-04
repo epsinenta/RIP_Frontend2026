@@ -1,18 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  deleteDepartmentApplication,
-  editDepartmentInApplication,
   fallbackImageUrl,
-  getDepartmentApplication,
-  listDepartments,
-  objectUrlFromKey,
+  resolveMediaUrl,
   type Department,
   type DepartmentApplicationDetailResponse,
   type DepartmentApplicationItemJSON,
 } from "../../modules/departmentsApi";
 import { DEPARTMENTS_MOCK, MOCK_APPLICATION_DETAIL } from "../../modules/mock";
-import { Spinner } from "react-bootstrap";
 import "./DepartmentApplicationPage.css";
 
 const ROLE_OPTIONS = ["Головной", "Руководящий", "Подчинённый"] as const;
@@ -32,55 +27,31 @@ function roleForSelect(role: string): string {
   return ROLE_OPTIONS.includes(r as (typeof ROLE_OPTIONS)[number]) ? r : "Подчинённый";
 }
 
-function resolvePhoto(photoKey: string): string {
-  if (!photoKey) return fallbackImageUrl();
-  if (
-    photoKey.startsWith("http://") ||
-    photoKey.startsWith("https://") ||
-    photoKey.startsWith("/") ||
-    photoKey.startsWith("blob:")
-  ) {
-    return photoKey;
-  }
-  return objectUrlFromKey(photoKey);
+function cloneApplicationDetail(
+  src: DepartmentApplicationDetailResponse,
+): DepartmentApplicationDetailResponse {
+  return JSON.parse(JSON.stringify(src)) as DepartmentApplicationDetailResponse;
 }
 
 export default function DepartmentApplicationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [data, setData] = useState<DepartmentApplicationDetailResponse | null>(null);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [loading, setLoading] = useState(true);
 
-  const reloadApplication = useCallback(async () => {
-    if (!id) return;
-    const res = await getDepartmentApplication(Number(id));
-    if (res) setData(res);
-    else if (Number(id) === MOCK_APPLICATION_DETAIL.department_application.department_application_id) {
-      setData(MOCK_APPLICATION_DETAIL);
-    } else {
-      setData(null);
+  const loadMock = useCallback(() => {
+    if (!id) return null;
+    const n = Number(id);
+    if (n === MOCK_APPLICATION_DETAIL.department_application.department_application_id) {
+      return cloneApplicationDetail(MOCK_APPLICATION_DETAIL);
     }
+    return null;
   }, [id]);
 
   useEffect(() => {
-    listDepartments()
-      .then((list) => {
-        if (list.length > 0) setDepartments(list);
-        else setDepartments(DEPARTMENTS_MOCK);
-      })
-      .catch(() => setDepartments(DEPARTMENTS_MOCK));
-  }, []);
+    setData(loadMock());
+  }, [loadMock]);
 
-  useEffect(() => {
-    if (!id) return;
-    const load = async () => {
-      setLoading(true);
-      await reloadApplication();
-      setLoading(false);
-    };
-    void load();
-  }, [id, reloadApplication]);
+  const departments = DEPARTMENTS_MOCK;
 
   const depById = useMemo(() => {
     const m = new Map<number, Department>();
@@ -93,48 +64,42 @@ export default function DepartmentApplicationPage() {
     return [...data.items].sort((a, b) => a.sort_order - b.sort_order);
   }, [data?.items]);
 
-  const handleMove = async (departmentId: number, direction: "up" | "down") => {
-    if (!data) return;
-    const ok = await editDepartmentInApplication(departmentId, data.department_application.department_application_id, {
-      direction,
+  const handleMove = (departmentId: number, direction: "up" | "down") => {
+    setData((prev) => {
+      if (!prev) return prev;
+      const sorted = [...prev.items].sort((a, b) => a.sort_order - b.sort_order);
+      const idx = sorted.findIndex((i) => i.department_id === departmentId);
+      if (idx < 0) return prev;
+      const j = direction === "up" ? idx - 1 : idx + 1;
+      if (j < 0 || j >= sorted.length) return prev;
+      const orderA = sorted[idx].sort_order;
+      const orderB = sorted[j].sort_order;
+      const newItems = prev.items.map((item) => {
+        if (item.department_id === sorted[idx].department_id) return { ...item, sort_order: orderB };
+        if (item.department_id === sorted[j].department_id) return { ...item, sort_order: orderA };
+        return item;
+      });
+      return { ...prev, items: newItems };
     });
-    if (ok) await reloadApplication();
-    else window.alert("Не удалось изменить порядок. Нужна авторизация или ошибка сервера.");
   };
 
-  const handleRoleChange = async (item: DepartmentApplicationItemJSON, role: string) => {
-    if (!data) return;
-    const ok = await editDepartmentInApplication(
-      item.department_id,
-      data.department_application.department_application_id,
-      {
-        role,
-        sort_order: item.sort_order,
-        salary: item.salary ?? undefined,
-      },
-    );
-    if (ok) await reloadApplication();
-    else window.alert("Не удалось сохранить роль. Нужна авторизация или ошибка сервера.");
+  const handleRoleChange = (item: DepartmentApplicationItemJSON, role: string) => {
+    setData((prev) => {
+      if (!prev) return prev;
+      const newItems = prev.items.map((row) =>
+        row.department_id === item.department_id && row.sort_order === item.sort_order
+          ? { ...row, role }
+          : row,
+      );
+      return { ...prev, items: newItems };
+    });
   };
 
-  const handleDeleteApplication = async (e: React.FormEvent) => {
+  const handleDeleteApplication = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data) return;
     if (!window.confirm("Удалить заявку?")) return;
-    const ok = await deleteDepartmentApplication(data.department_application.department_application_id);
-    if (ok) navigate("/");
-    else window.alert("Не удалось удалить заявку. Нужна авторизация или ошибка сервера.");
+    navigate("/");
   };
-
-  if (loading) {
-    return (
-      <div className="department-application-page">
-        <div className="device-page-loader">
-          <Spinner animation="border" />
-        </div>
-      </div>
-    );
-  }
 
   if (!data) {
     return (
@@ -181,7 +146,7 @@ export default function DepartmentApplicationPage() {
                   item.main_department_id != null
                     ? depById.get(item.main_department_id)
                     : undefined;
-                const photoUrl = dep ? resolvePhoto(dep.photo_url) : fallbackImageUrl();
+                const photoUrl = dep ? resolveMediaUrl(dep.photo_url) : fallbackImageUrl();
                 const salaryStr = item.salary != null ? `${Math.round(item.salary)} ₽` : "—";
                 const mainCell =
                   item.main_department_id == null || item.main_department_id === item.department_id
@@ -196,7 +161,7 @@ export default function DepartmentApplicationPage() {
                           className="move-btn"
                           disabled={idx === 0}
                           title="Выше"
-                          onClick={() => void handleMove(item.department_id, "up")}
+                          onClick={() => handleMove(item.department_id, "up")}
                         >
                           ↑
                         </button>
@@ -205,7 +170,7 @@ export default function DepartmentApplicationPage() {
                           className="move-btn"
                           disabled={idx === sortedItems.length - 1}
                           title="Ниже"
-                          onClick={() => void handleMove(item.department_id, "down")}
+                          onClick={() => handleMove(item.department_id, "down")}
                         >
                           ↓
                         </button>
@@ -222,7 +187,7 @@ export default function DepartmentApplicationPage() {
                         <select
                           className="role-select"
                           value={roleForSelect(item.role)}
-                          onChange={(e) => void handleRoleChange(item, e.target.value)}
+                          onChange={(e) => handleRoleChange(item, e.target.value)}
                         >
                           {ROLE_OPTIONS.map((opt) => (
                             <option key={opt} value={opt}>

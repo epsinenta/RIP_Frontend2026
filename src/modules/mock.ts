@@ -1,4 +1,8 @@
-import { type Department, type DepartmentApplicationDetailResponse } from "./departmentsApi";
+import {
+  type Department,
+  type DepartmentApplicationCart,
+  type DepartmentApplicationDetailResponse,
+} from "./departmentsApi";
 import accountingPhoto from "../assets/accounting.jpg";
 import accountingVideo from "../assets/accounting.mp4";
 import hrPhoto from "../assets/hr_department.jpg";
@@ -62,6 +66,33 @@ export const DEPARTMENTS_MOCK: Department[] = [
     short_description: "Бюджетирование и контроль затрат.",
   },
 ];
+
+/** Корзина заявки (лаб. 5): черновик с двумя отделами для демонстрации. */
+export const MOCK_CART: DepartmentApplicationCart = {
+  has_draft: true,
+  departments_count: 2,
+  incomplete_items_count: 0,
+  id: 1,
+};
+
+export function getMockDepartment(id: number): Department | undefined {
+  return DEPARTMENTS_MOCK.find((d) => d.department_id === id);
+}
+
+export function filterMockDepartmentsByTitle(title: string): Department[] {
+  const t = title.trim().toLowerCase();
+  if (!t) return [...DEPARTMENTS_MOCK];
+  return DEPARTMENTS_MOCK.filter((d) => d.title.toLowerCase().includes(t));
+}
+
+/** Имитация добавления в заявку без бэкенда (лаб. 5). */
+export async function addDepartmentToMockApplication(
+  departmentId: number,
+): Promise<{ ok: true } | { ok: false; message?: string }> {
+  void departmentId;
+  await new Promise((r) => setTimeout(r, 200));
+  return { ok: true };
+}
 
 export const MOCK_APPLICATION_DETAIL: DepartmentApplicationDetailResponse = {
   department_application: {
