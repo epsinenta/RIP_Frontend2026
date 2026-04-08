@@ -53,7 +53,6 @@ export function fallbackImageUrl(): string {
   );
 }
 
-/** URL из Vite (import) или абсолютный путь; иначе — заглушка (лаб. 5, только mock). */
 export function resolveMediaUrl(key: string): string {
   if (!key) return fallbackImageUrl();
   if (

@@ -67,7 +67,6 @@ export const DEPARTMENTS_MOCK: Department[] = [
   },
 ];
 
-/** Корзина заявки (лаб. 5): черновик с двумя отделами для демонстрации. */
 export const MOCK_CART: DepartmentApplicationCart = {
   has_draft: true,
   departments_count: 2,
@@ -85,7 +84,6 @@ export function filterMockDepartmentsByTitle(title: string): Department[] {
   return DEPARTMENTS_MOCK.filter((d) => d.title.toLowerCase().includes(t));
 }
 
-/** Имитация добавления в заявку без бэкенда (лаб. 5). */
 export async function addDepartmentToMockApplication(
   departmentId: number,
 ): Promise<{ ok: true } | { ok: false; message?: string }> {
