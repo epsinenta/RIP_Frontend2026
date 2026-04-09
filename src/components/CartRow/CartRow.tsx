@@ -1,7 +1,6 @@
 import "./CartRow.css";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
-import { objectUrlFromKey } from "../../modules/departmentsApi";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { fetchDepartmentApplicationCart } from "../../store/slices/departmentApplicationSlice";
 
@@ -25,7 +24,7 @@ export default function CartRow() {
   const count = isAuthenticated ? (cart?.departments_count ?? 0) : 0;
   const hasDraft = isAuthenticated && Boolean(cart?.has_draft);
   const applicationId = isAuthenticated ? cart?.id : undefined;
-  const iconSrc = objectUrlFromKey("department.svg");
+  const iconSrc = `${import.meta.env.BASE_URL}cart.svg`;
 
   const inner = (
     <>
