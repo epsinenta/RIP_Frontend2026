@@ -53,6 +53,40 @@
   flex-shrink: 0;
 }
 
+.department-application-page__table-wrap .app-table__col-remove {
+  min-width: 108px;
+  width: 1%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.department-application-page__btn-remove-line {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #c55f4d;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #c55f4d;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.department-application-page__btn-remove-line:hover:not(:disabled) {
+  background: #fef6f4;
+  color: #a94e3e;
+  border-color: #a94e3e;
+}
+
+.department-application-page__btn-remove-line:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .order-buttons {
   display: flex;
   flex-direction: column;

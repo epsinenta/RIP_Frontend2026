@@ -16,6 +16,7 @@ import {
   fetchDepartmentApplicationDetail,
   formDepartmentApplication,
   moveDepartmentInApplication,
+  removeDepartmentLineFromApplication,
   updateDepartmentLineInApplication,
   type DepartmentApplicationDetailPayload,
 } from "../../store/slices/departmentApplicationSlice";
@@ -71,7 +72,7 @@ export default function DepartmentApplicationPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((s) => s.user);
-  const { detail, detailLoading, applicationMutationLoading } = useAppSelector(
+  const { detail, detailLoading, applicationMutationLoading, itemMutationLoading } = useAppSelector(
     (s) => s.departmentApplication,
   );
 
@@ -185,6 +186,24 @@ export default function DepartmentApplicationPage() {
     void dispatch(formDepartmentApplication(applicationId));
   };
 
+  const handleRemoveLine = async (departmentId: number) => {
+    if (!applicationId || !isDraft) return;
+    if (!window.confirm("Убрать подразделение из заявки?")) return;
+    if (mockData && !detail) {
+      setMockData((prev) =>
+        prev ? { ...prev, items: prev.items.filter((i) => i.department_id !== departmentId) } : null,
+      );
+      return;
+    }
+    try {
+      await dispatch(
+        removeDepartmentLineFromApplication({ departmentId, applicationId }),
+      ).unwrap();
+    } catch {
+      void 0;
+    }
+  };
+
   const handleDeleteApplication = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!applicationId || !isDraft) return;
@@ -265,6 +284,9 @@ export default function DepartmentApplicationPage() {
                 <th className="app-table__col-salary">Зарплата руководителя</th>
                 <th className="app-table__col-role">Роль</th>
                 <th className="app-table__col-main">Руководящий отдел</th>
+                <th className="app-table__col-remove" scope="col">
+                  {isDraft ? "Из заявки" : ""}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -334,6 +356,20 @@ export default function DepartmentApplicationPage() {
                       </div>
                     </td>
                     <td className="app-table__col-main">{mainCell}</td>
+                    <td className="app-table__col-remove">
+                      {isDraft ? (
+                        <button
+                          type="button"
+                          className="department-application-page__btn-remove-line"
+                          disabled={Boolean(itemMutationLoading[`rm-${did}`])}
+                          onClick={() => void handleRemoveLine(did)}
+                        >
+                          Удалить
+                        </button>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
                   </tr>
                 );
               })}
