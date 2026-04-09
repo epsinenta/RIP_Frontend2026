@@ -176,6 +176,23 @@ export const updateDepartmentLineInApplication = createAsyncThunk(
   },
 );
 
+export const removeDepartmentLineFromApplication = createAsyncThunk(
+  "departmentApplication/removeLine",
+  async (
+    { departmentId, applicationId }: { departmentId: number; applicationId: number },
+    { rejectWithValue, dispatch },
+  ) => {
+    try {
+      await api.depAppDep.depAppDepDelete(departmentId, applicationId);
+      await dispatch(fetchDepartmentApplicationDetail(applicationId));
+      await dispatch(fetchDepartmentApplicationCart());
+      return departmentId;
+    } catch (e) {
+      return rejectWithValue(apiErrMessage(e));
+    }
+  },
+);
+
 export const formDepartmentApplication = createAsyncThunk(
   "departmentApplication/form",
   async (applicationId: number, { rejectWithValue, dispatch }) => {
@@ -343,6 +360,18 @@ const departmentApplicationSlice = createSlice({
       .addCase(finishDepartmentApplication.rejected, (state, action) => {
         const id = action.meta?.arg?.applicationId;
         if (id != null) delete state.itemMutationLoading[`finish-${id}`];
+      })
+      .addCase(removeDepartmentLineFromApplication.pending, (state, action) => {
+        const id = action.meta.arg.departmentId;
+        state.itemMutationLoading[`rm-${id}`] = true;
+      })
+      .addCase(removeDepartmentLineFromApplication.fulfilled, (state, action) => {
+        const id = action.payload;
+        delete state.itemMutationLoading[`rm-${id}`];
+      })
+      .addCase(removeDepartmentLineFromApplication.rejected, (state, action) => {
+        const id = action.meta?.arg?.departmentId;
+        if (id != null) delete state.itemMutationLoading[`rm-${id}`];
       });
   },
 });
