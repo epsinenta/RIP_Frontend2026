@@ -1,6 +1,9 @@
 import { Api } from "./Api";
 
-const baseURL = import.meta.env.VITE_API_BASE_URL ?? "/api";
+const apiOrigin = (import.meta.env.VITE_API_ORIGIN as string | undefined)?.replace(/\/$/, "") ?? "";
+const baseURL = apiOrigin
+  ? `${apiOrigin}${import.meta.env.VITE_API_BASE_URL ?? "/api"}`
+  : (import.meta.env.VITE_API_BASE_URL ?? "/api");
 
 export const api = new Api({
   baseURL,

@@ -182,3 +182,37 @@
 .clip-result-row__en {
   font-size: 0.88rem;
 }
+
+@media (max-width: 640px) {
+  .furniture-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .row-image {
+    width: 100%;
+    height: 160px;
+  }
+
+  .row-stats {
+    width: 100%;
+    padding-left: 0;
+    border-left: none;
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+  }
+
+  .departments-page__clip-search {
+    padding: 0 12px 16px;
+  }
+
+  .clip-search-section__panel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .clip-search-section__action-panel {
+    width: 100%;
+  }
+}

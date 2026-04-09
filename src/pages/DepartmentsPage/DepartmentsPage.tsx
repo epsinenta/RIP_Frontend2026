@@ -13,6 +13,9 @@ import {
 import type { Department } from "../../modules/departmentsApi";
 import { DEPARTMENTS_MOCK } from "../../modules/mock";
 import { useDepartmentImageSearch } from "../../hooks/useDepartmentImageSearch";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { setDepartmentTitleQuery } from "../../store/slices/departmentFilterSlice";
+import { isTauriGuest } from "../../modules/appEnv";
 import "./DepartmentsPage.css";
 
 function resolveThumb(key: string): string {
@@ -29,9 +32,10 @@ function resolveThumb(key: string): string {
 }
 
 export default function DepartmentsPage() {
+  const dispatch = useAppDispatch();
+  const searchTitle = useAppSelector((s) => s.departmentFilter.titleQuery);
   const [clipSourceDepartments, setClipSourceDepartments] = useState<Department[]>([]);
   const [displayDepartments, setDisplayDepartments] = useState<Department[]>([]);
-  const [searchTitle, setSearchTitle] = useState("");
   const [loading, setLoading] = useState(false);
   const [useMock, setUseMock] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -89,7 +93,7 @@ export default function DepartmentsPage() {
     workerError,
     searchByImage,
     resetSearch,
-  } = useDepartmentImageSearch(clipItems, clipSessionActive);
+  } = useDepartmentImageSearch(clipItems, !isTauriGuest && clipSessionActive);
 
   const depById = useMemo(() => {
     const m = new Map<number, Department>();
@@ -158,12 +162,17 @@ export default function DepartmentsPage() {
 
   return (
     <div className="departments-page">
-      <Search query={searchTitle} onQueryChange={setSearchTitle} onSearch={handleSearch} />
+      <Search
+        query={searchTitle}
+        onQueryChange={(v) => dispatch(setDepartmentTitleQuery(v))}
+        onSearch={handleSearch}
+      />
 
       <div className="space">
         <main className="departments-page__main">
-          <CartRow />
+          {isTauriGuest ? null : <CartRow />}
 
+          {isTauriGuest ? null : (
           <section
             className="departments-page__clip-search clip-search-section"
             aria-labelledby="clip-search-title"
@@ -222,6 +231,7 @@ export default function DepartmentsPage() {
               </div>
             )}
           </section>
+          )}
 
           {loading ? (
             <div>Загрузка...</div>

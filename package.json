@@ -5,10 +5,17 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:guest": "cross-env VITE_TAURI_GUEST=true vite",
     "build": "tsc -b && vite build",
+    "build:tauri": "cross-env VITE_TAURI_GUEST=true VITE_BASE_PATH=/ vite build",
     "lint": "eslint .",
     "generate-api": "node scripts/generate-api.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "tauri:build:local": "dotenv -e .env.tauri.local -- npm run tauri:build"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",
@@ -23,6 +30,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
+    "@tauri-apps/cli": "^2.9.4",
     "@types/node": "^24.6.0",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
@@ -33,8 +41,12 @@
     "eslint-plugin-react-refresh": "^0.4.22",
     "globals": "^16.4.0",
     "swagger-typescript-api": "^13.2.16",
+    "cross-env": "^7.0.3",
+    "dotenv-cli": "^8.0.0",
+    "gh-pages": "^6.3.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.45.0",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-pwa": "^1.1.0"
   }
 }

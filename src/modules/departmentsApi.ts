@@ -1,3 +1,5 @@
+import { apiUrl } from "./apiUrl";
+
 const MINIO_PUBLIC_BASE =
   (import.meta.env.VITE_MINIO_PUBLIC_BASE?.replace(/\/$/, "") as string | undefined) ??
   "http://localhost:9000/test";
@@ -71,7 +73,7 @@ export function fallbackImageUrl(): string {
 
 export async function getDepartmentApplicationCart(): Promise<DepartmentApplicationCart> {
   try {
-    const res = await fetch("/api/department_application/department_application-cart", {
+    const res = await fetch(apiUrl("/api/department_application/department_application-cart"), {
       headers: { Accept: "application/json" },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -88,7 +90,7 @@ export async function getDepartmentApplication(
   const token = localStorage.getItem("token");
   if (token) headers["Authorization"] = `Bearer ${token}`;
   try {
-    const res = await fetch(`/api/department_application/${id}`, { headers });
+    const res = await fetch(apiUrl(`/api/department_application/${id}`), { headers });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch {
@@ -104,7 +106,7 @@ export async function listDepartments(params?: { title?: string }): Promise<Depa
       q.append("Title", params.title);
       path += `?${q.toString()}`;
     }
-    const res = await fetch(path, { headers: { Accept: "application/json" } });
+    const res = await fetch(apiUrl(path), { headers: { Accept: "application/json" } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return await res.json();
   } catch {
@@ -114,7 +116,7 @@ export async function listDepartments(params?: { title?: string }): Promise<Depa
 
 export async function getDepartment(id: number): Promise<Department | null> {
   try {
-    const res = await fetch(`/api/department/${id}`, {
+    const res = await fetch(apiUrl(`/api/department/${id}`), {
       headers: { Accept: "application/json" },
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -132,7 +134,7 @@ export async function addDepartmentToApplication(
     return { ok: false, status: 401 };
   }
   try {
-    const res = await fetch(`/api/dep_app_dep/add/${departmentId}`, {
+    const res = await fetch(apiUrl(`/api/dep_app_dep/add/${departmentId}`), {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -166,7 +168,7 @@ export async function editDepartmentInApplication(
   const token = localStorage.getItem("token");
   if (!token) return false;
   try {
-    const res = await fetch(`/api/dep_app_dep/${departmentId}/${applicationId}`, {
+    const res = await fetch(apiUrl(`/api/dep_app_dep/${departmentId}/${applicationId}`), {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
@@ -186,7 +188,7 @@ export async function deleteDepartmentApplication(applicationId: number): Promis
   if (!token) return false;
   try {
     const res = await fetch(
-      `/api/department_application/${applicationId}/delete-department_application`,
+      apiUrl(`/api/department_application/${applicationId}/delete-department_application`),
       {
         method: "DELETE",
         headers: { Accept: "application/json", Authorization: `Bearer ${token}` },

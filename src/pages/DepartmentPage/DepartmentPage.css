@@ -166,3 +166,26 @@
   font-weight: 600;
   color: #fff;
 }
+
+@media (max-width: 576px) {
+  .vibes-page--scroll .vibes-hero .vibes-viewport {
+    min-height: min(72vh, 720px);
+    max-height: none;
+    padding: 0 8px 12px;
+  }
+
+  .vibes-media {
+    max-width: none;
+    min-height: 52vh;
+  }
+
+  .vibes-content {
+    padding: 10px 14px 18px;
+  }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .vibes-media {
+    max-width: min(100%, 520px);
+  }
+}
