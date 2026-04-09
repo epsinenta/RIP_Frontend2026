@@ -8,6 +8,8 @@
     "dev": "vite",
     "dev:guest": "cross-env VITE_TAURI_GUEST=true vite",
     "build": "tsc -b && vite build",
+    "build:pages": "cross-env VITE_BASE_PATH=/RIP_Frontend2026/ npm run build",
+    "deploy:pages": "npm run build:pages && gh-pages -d dist -b gh-pages",
     "build:tauri": "cross-env VITE_TAURI_GUEST=true VITE_BASE_PATH=/ vite build",
     "lint": "eslint .",
     "generate-api": "node scripts/generate-api.mjs",
