@@ -4,7 +4,6 @@ import logo from "../../assets/logo.png";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { logoutUser } from "../../store/slices/userSlice";
 import { ROUTES } from "../../Routes";
-import { isTauriGuest } from "../../modules/appEnv";
 import "./AppHeader.css";
 
 export default function AppHeader() {
@@ -36,11 +35,7 @@ export default function AppHeader() {
           <NavLink to={ROUTES.DEPARTMENTS} className="app-header__link" end>
             Главная
           </NavLink>
-          {isTauriGuest ? (
-            <NavLink to="/department_application/1" className="app-header__link">
-              Демо-заявка
-            </NavLink>
-          ) : isAuthenticated ? (
+          {isAuthenticated ? (
             <>
               <NavLink to={ROUTES.DEPARTMENT_APPLICATIONS} className="app-header__link">
                 Заявки
@@ -68,11 +63,7 @@ export default function AppHeader() {
             <NavLink to={ROUTES.DEPARTMENTS} className="app-header__link" end>
               Главная
             </NavLink>
-            {isTauriGuest ? (
-              <NavLink to="/department_application/1" className="app-header__link">
-                Демо-заявка
-              </NavLink>
-            ) : isAuthenticated ? (
+            {isAuthenticated ? (
               <>
                 <NavLink to={ROUTES.DEPARTMENT_APPLICATIONS} className="app-header__link">
                   Заявки

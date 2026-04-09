@@ -10,7 +10,6 @@ import {
   type DepartmentApplicationItemJSON,
 } from "../../modules/departmentsApi";
 import { DEPARTMENTS_MOCK, MOCK_APPLICATION_DETAIL } from "../../modules/mock";
-import { isTauriGuest } from "../../modules/appEnv";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   deleteDepartmentApplication as deleteDepartmentApplicationThunk,
@@ -106,12 +105,7 @@ export default function DepartmentApplicationPage() {
   }, []);
 
   useEffect(() => {
-    if (!id || !isTauriGuest) return;
-    void reloadMock();
-  }, [id, reloadMock]);
-
-  useEffect(() => {
-    if (!id || isTauriGuest || !isAuthenticated) return;
+    if (!id || !isAuthenticated) return;
     setMockData(null);
     void dispatch(fetchDepartmentApplicationDetail(Number(id))).then((a) => {
       if (fetchDepartmentApplicationDetail.rejected.match(a)) {
@@ -121,7 +115,7 @@ export default function DepartmentApplicationPage() {
   }, [id, isAuthenticated, dispatch, reloadMock]);
 
   useEffect(() => {
-    if (isTauriGuest || isAuthenticated) return;
+    if (isAuthenticated) return;
     navigate(ROUTES.SIGN_IN, { replace: true });
   }, [isAuthenticated, navigate]);
 
@@ -143,7 +137,7 @@ export default function DepartmentApplicationPage() {
   const applicationId = app?.department_application_id;
 
   const handleMove = async (departmentId: number, direction: "up" | "down") => {
-    if (isTauriGuest || !applicationId || !isDraft) return;
+    if (!applicationId || !isDraft) return;
     if (mockData && !detail) {
       const ok = await editDepartmentInApplication(departmentId, applicationId, { direction });
       if (ok) void reloadMock();
@@ -153,7 +147,7 @@ export default function DepartmentApplicationPage() {
   };
 
   const handleRoleChange = async (item: DepartmentApplicationDetailPayload["items"][0], role: string) => {
-    if (isTauriGuest || !applicationId || !isDraft) return;
+    if (!applicationId || !isDraft) return;
     const row = toItemJson(item);
     if (mockData && !detail) {
       const ok = await editDepartmentInApplication(item.department_id ?? 0, applicationId, {
@@ -176,7 +170,7 @@ export default function DepartmentApplicationPage() {
   };
 
   const handleForm = () => {
-    if (isTauriGuest || !applicationId || !isDraft) return;
+    if (!applicationId || !isDraft) return;
     if (mockData && !detail) {
       setMockData((prev) =>
         prev
@@ -193,7 +187,7 @@ export default function DepartmentApplicationPage() {
 
   const handleDeleteApplication = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (isTauriGuest || !applicationId || !isDraft) return;
+    if (!applicationId || !isDraft) return;
     if (!window.confirm("Удалить заявку?")) return;
     if (mockData && !detail) {
       navigate("/");
@@ -207,7 +201,7 @@ export default function DepartmentApplicationPage() {
     }
   };
 
-  if (!isAuthenticated && !isTauriGuest) {
+  if (!isAuthenticated) {
     return null;
   }
 
@@ -247,7 +241,7 @@ export default function DepartmentApplicationPage() {
           </div>
         </div>
 
-        {isDraft && !isTauriGuest ? (
+        {isDraft ? (
           <div className="department-application-page__actions">
             <Button
               type="button"
@@ -293,7 +287,7 @@ export default function DepartmentApplicationPage() {
                         <button
                           type="button"
                           className="move-btn"
-                          disabled={isTauriGuest || !isDraft || idx === 0}
+                          disabled={!isDraft || idx === 0}
                           title="Выше"
                           onClick={() => void handleMove(did, "up")}
                         >
@@ -302,7 +296,7 @@ export default function DepartmentApplicationPage() {
                         <button
                           type="button"
                           className="move-btn"
-                          disabled={isTauriGuest || !isDraft || idx === sortedItems.length - 1}
+                          disabled={!isDraft || idx === sortedItems.length - 1}
                           title="Ниже"
                           onClick={() => void handleMove(did, "down")}
                         >
@@ -322,7 +316,7 @@ export default function DepartmentApplicationPage() {
                     </td>
                     <td className="app-table__col-role">
                       <div className="role-form">
-                        {isDraft && !isTauriGuest ? (
+                        {isDraft ? (
                           <select
                             className="role-select"
                             value={roleForSelect(item.role ?? "")}
@@ -347,7 +341,7 @@ export default function DepartmentApplicationPage() {
           </table>
         </div>
 
-        {isDraft && !isTauriGuest ? (
+        {isDraft ? (
           <form className="department-application-page__delete-form" onSubmit={handleDeleteApplication}>
             <button type="submit" className="search-btn department-application-page__delete-btn">
               Удалить заявку

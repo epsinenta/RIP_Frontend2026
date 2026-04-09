@@ -12,7 +12,7 @@ function normalizeBase(raw: string | undefined): string {
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const base = normalizeBase(env.VITE_BASE_PATH);
-  const devApiProxy = env.VITE_DEV_API_PROXY || "http://localhost:8000";
+  const devApiProxy = env.VITE_DEV_API_PROXY || "http://localhost:8080";
   const pwaName = "1С: Корпоративная структура";
 
   return {

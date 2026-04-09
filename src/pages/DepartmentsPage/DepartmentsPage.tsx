@@ -15,7 +15,6 @@ import { DEPARTMENTS_MOCK } from "../../modules/mock";
 import { useDepartmentImageSearch } from "../../hooks/useDepartmentImageSearch";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { setDepartmentTitleQuery } from "../../store/slices/departmentFilterSlice";
-import { isTauriGuest } from "../../modules/appEnv";
 import "./DepartmentsPage.css";
 
 function resolveThumb(key: string): string {
@@ -93,7 +92,7 @@ export default function DepartmentsPage() {
     workerError,
     searchByImage,
     resetSearch,
-  } = useDepartmentImageSearch(clipItems, !isTauriGuest && clipSessionActive);
+  } = useDepartmentImageSearch(clipItems, clipSessionActive);
 
   const depById = useMemo(() => {
     const m = new Map<number, Department>();
@@ -170,9 +169,8 @@ export default function DepartmentsPage() {
 
       <div className="space">
         <main className="departments-page__main">
-          {isTauriGuest ? null : <CartRow />}
+          <CartRow />
 
-          {isTauriGuest ? null : (
           <section
             className="departments-page__clip-search clip-search-section"
             aria-labelledby="clip-search-title"
@@ -231,7 +229,6 @@ export default function DepartmentsPage() {
               </div>
             )}
           </section>
-          )}
 
           {loading ? (
             <div>Загрузка...</div>

@@ -5,15 +5,16 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev:guest": "cross-env VITE_TAURI_GUEST=true vite",
     "build": "tsc -b && vite build",
-    "build:tauri": "cross-env VITE_TAURI_GUEST=true VITE_BASE_PATH=/ vite build",
+    "build:tauri": "cross-env VITE_BASE_PATH=/ vite build",
     "lint": "eslint .",
     "generate-api": "node scripts/generate-api.mjs",
     "preview": "vite preview",
     "deploy": "gh-pages -d dist",
     "tauri": "tauri",
+    "tauri:precheck": "cargo --version",
     "tauri:dev": "tauri dev",
+    "tauri:dev:local": "dotenv -e .env.tauri.local -- tauri dev",
     "tauri:build": "tauri build",
     "tauri:build:local": "dotenv -e .env.tauri.local -- npm run tauri:build"
   },
