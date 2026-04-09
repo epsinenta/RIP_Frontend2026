@@ -2,6 +2,7 @@
   "name": "web_frontend",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://epsinenta.github.io/RIP_Frontend2026/",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -11,7 +12,7 @@
     "lint": "eslint .",
     "generate-api": "node scripts/generate-api.mjs",
     "preview": "vite preview",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d dist -b gh-pages",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",

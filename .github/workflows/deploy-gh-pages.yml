@@ -1,0 +1,40 @@
+name: Deploy to gh-pages
+
+on:
+  push:
+    branches:
+      - main
+      - lab8-tauri-pwa
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          VITE_BASE_PATH: /RIP_Frontend2026/
+        run: npm run build
+
+      - name: Publish to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          branch: gh-pages
+          force_orphan: true
