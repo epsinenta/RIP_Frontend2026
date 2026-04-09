@@ -21,6 +21,8 @@ export const DEPARTMENTS_MOCK: Department[] = [
     reports_to: "Директор по ИТ",
     video: itVideo,
     short_description: "Backend, frontend, DevOps и тестирование.",
+    short_description_en:
+      "Software engineering, backend, frontend, DevOps and quality assurance.",
   },
   {
     department_id: 2,
@@ -34,6 +36,7 @@ export const DEPARTMENTS_MOCK: Department[] = [
     reports_to: "Коммерческий директор",
     video: procurementVideo,
     short_description: "B2B-продажи, сопровождение сделок.",
+    short_description_en: "B2B sales, account management and deal support.",
   },
   {
     department_id: 3,
@@ -47,6 +50,7 @@ export const DEPARTMENTS_MOCK: Department[] = [
     reports_to: "Генеральный директор",
     video: hrVideo,
     short_description: "Кадровый учёт и развитие сотрудников.",
+    short_description_en: "Human resources, recruitment and employee development.",
   },
   {
     department_id: 4,
@@ -60,6 +64,7 @@ export const DEPARTMENTS_MOCK: Department[] = [
     reports_to: "Финансовый директор",
     video: accountingVideo,
     short_description: "Бюджетирование и контроль затрат.",
+    short_description_en: "Financial planning, budgeting and cost control.",
   },
 ];
 

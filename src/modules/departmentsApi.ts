@@ -13,10 +13,13 @@ export interface Department {
   reports_to: string;
   video: string;
   short_description: string;
+  short_description_en?: string;
 }
 
 export function departmentClipDescription(d: Department): string {
-  return d.description.trim();
+  const en = d.short_description_en?.trim();
+  if (en) return en;
+  return "Corporate department unit.";
 }
 
 export interface DepartmentApplicationCart {
