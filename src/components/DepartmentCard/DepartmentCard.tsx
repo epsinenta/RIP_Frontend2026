@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState, type MouseEvent } from "react";
 import type { Department } from "../../modules/departmentsApi";
-import {
-  addDepartmentToApplication,
-  fallbackImageUrl,
-  objectUrlFromKey,
-} from "../../modules/departmentsApi";
+import { fallbackImageUrl, objectUrlFromKey } from "../../modules/departmentsApi";
 import "./DepartmentCard.css";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { addDepartmentToApplication as addDepartmentToApplicationThunk } from "../../store/slices/departmentApplicationSlice";
 
 const CART_UPDATED = "department-cart-updated";
 
@@ -24,6 +22,11 @@ function resolvePhotoSrc(photo_url: string, imageError: boolean): string {
 }
 
 export default function DepartmentCard({ department }: { department: Department }) {
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((s) => s.user);
+  const applicationMutationLoading = useAppSelector(
+    (s) => s.departmentApplication.applicationMutationLoading,
+  );
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState(resolvePhotoSrc(department.photo_url, false));
   const [adding, setAdding] = useState(false);
@@ -41,16 +44,19 @@ export default function DepartmentCard({ department }: { department: Department 
   const handleAdd = async (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!isAuthenticated) return;
     setAdding(true);
     try {
-      const result = await addDepartmentToApplication(department.department_id);
-      if (result.ok) {
-        window.dispatchEvent(new Event(CART_UPDATED));
-      }
+      await dispatch(addDepartmentToApplicationThunk(department.department_id)).unwrap();
+      window.dispatchEvent(new Event(CART_UPDATED));
+    } catch {
+      void 0;
     } finally {
       setAdding(false);
     }
   };
+
+  const busy = adding || applicationMutationLoading;
 
   return (
     <div className="card-wrapper">
@@ -67,13 +73,8 @@ export default function DepartmentCard({ department }: { department: Department 
           <p className="card__description">{department.short_description}</p>
         </div>
       </Link>
-      <button
-        type="button"
-        className="card-add-btn"
-        onClick={handleAdd}
-        disabled={adding}
-      >
-        {adding ? "Добавление…" : "Добавить в заявку"}
+      <button type="button" className="card-add-btn" onClick={handleAdd} disabled={busy}>
+        {busy ? "Добавление…" : "Добавить в заявку"}
       </button>
     </div>
   );

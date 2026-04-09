@@ -131,6 +131,23 @@
   background-color: #a94e3e !important;
 }
 
+.department-application-page__btn-form {
+  border-color: #e6ac00 !important;
+  background-color: #ffeb3b !important;
+  color: #2c353d !important;
+  font-weight: 600;
+}
+
+.department-application-page__btn-form:hover:not(:disabled) {
+  background-color: #ffe022 !important;
+  border-color: #d9a000 !important;
+  color: #1a1a1a !important;
+}
+
+.department-application-page__btn-form:disabled {
+  opacity: 0.72;
+}
+
 @media (max-width: 640px) {
   .department-application-page__table-wrap .app-table tbody tr.hierarchy-level-2 {
     width: calc(100% - 40px);
@@ -141,3 +158,8 @@
   }
 
 }
+
+.department-application-page__actions {
+  margin: 16px 0;
+}
+

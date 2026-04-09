@@ -1,36 +1,43 @@
 import "./CartRow.css";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { getDepartmentApplicationCart, objectUrlFromKey } from "../../modules/departmentsApi";
+import { useEffect } from "react";
+import { objectUrlFromKey } from "../../modules/departmentsApi";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { fetchDepartmentApplicationCart } from "../../store/slices/departmentApplicationSlice";
 
 export default function CartRow() {
-  const [count, setCount] = useState(0);
-  const [hasDraft, setHasDraft] = useState(false);
-  const [applicationId, setApplicationId] = useState<number | undefined>();
+  const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAppSelector((s) => s.user);
+  const { cart, cartLoading } = useAppSelector((s) => s.departmentApplication);
+
+  useEffect(() => {
+    void dispatch(fetchDepartmentApplicationCart());
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
     const load = () => {
-      void getDepartmentApplicationCart().then((data) => {
-        setCount(data.departments_count);
-        setHasDraft(data.has_draft);
-        setApplicationId(data.id);
-      });
+      void dispatch(fetchDepartmentApplicationCart());
     };
-    load();
     window.addEventListener("department-cart-updated", load);
     return () => window.removeEventListener("department-cart-updated", load);
-  }, []);
+  }, [dispatch]);
 
+  const count = isAuthenticated ? (cart?.departments_count ?? 0) : 0;
+  const hasDraft = isAuthenticated && Boolean(cart?.has_draft);
+  const applicationId = isAuthenticated ? cart?.id : undefined;
   const iconSrc = objectUrlFromKey("department.svg");
 
   const inner = (
     <>
       <img src={iconSrc} alt="" className="cart-row__icon" />
-      <span className="cart-row__text">Отделов в заявке: {count}</span>
+      <span className="cart-row__text">
+        Отделов в заявке: {count}
+        {cartLoading ? "…" : ""}
+      </span>
     </>
   );
 
-  if (hasDraft && count > 0 && applicationId != null) {
+  if (isAuthenticated && hasDraft && count > 0 && applicationId != null) {
     return (
       <div className="cart-row">
         <Link to={`/department_application/${applicationId}`} className="cart-row__link">

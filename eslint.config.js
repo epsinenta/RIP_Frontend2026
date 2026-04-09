@@ -7,6 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
+  globalIgnores(['src/api/Api.ts']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -18,6 +19,12 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+  },
+  {
+    files: ['src/Routes.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
     },
   },
 ])

@@ -129,7 +129,7 @@ export async function addDepartmentToApplication(
 ): Promise<{ ok: true } | { ok: false; status: number; message?: string }> {
   const token = localStorage.getItem("token");
   if (!token) {
-    return { ok: false, status: 401, message: "Войдите в систему, чтобы добавить отдел в заявку." };
+    return { ok: false, status: 401 };
   }
   try {
     const res = await fetch(`/api/dep_app_dep/add/${departmentId}`, {

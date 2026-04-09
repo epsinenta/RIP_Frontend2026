@@ -1,0 +1,137 @@
+.dept-apps-page {
+  padding: 0 20px 48px;
+}
+
+.dept-apps-page__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dept-apps-page__heading {
+  margin: 20px 0 8px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.dept-apps-page__sub {
+  margin: 0 0 20px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.dept-apps-page__filters {
+  background: #fff;
+  border: 1px solid #d9d9d9;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.dept-apps-page__filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.dept-apps-page__fg {
+  min-width: 160px;
+}
+
+.dept-apps-page__fg--grow {
+  flex: 1;
+  min-width: 200px;
+}
+
+.dept-apps-page__apply {
+  margin-top: 16px;
+  font-weight: 600;
+  border-color: #e6ac00 !important;
+  background-color: #ffeb3b !important;
+  color: #2c353d !important;
+}
+
+.dept-apps-page__apply:hover:not(:disabled) {
+  background-color: #ffe022 !important;
+  border-color: #d9a000 !important;
+  color: #1a1a1a !important;
+}
+
+.dept-apps-page__btn-finish {
+  border-color: #e6ac00 !important;
+  background-color: #ffeb3b !important;
+  color: #2c353d !important;
+  font-weight: 600;
+}
+
+.dept-apps-page__btn-finish:hover:not(:disabled) {
+  background-color: #ffe022 !important;
+  border-color: #d9a000 !important;
+  color: #1a1a1a !important;
+}
+
+.dept-apps-page__btn-reject {
+  border-color: #c55f4d !important;
+  color: #a94e3e !important;
+  background-color: #fff !important;
+  font-weight: 600;
+}
+
+.dept-apps-page__btn-reject:hover:not(:disabled) {
+  background-color: rgba(197, 95, 77, 0.08) !important;
+  border-color: #a94e3e !important;
+  color: #8b3d32 !important;
+}
+
+.dept-apps-page__error {
+  background: #faf6f4;
+  border: 1px solid #c55f4d;
+  color: #6b2f26;
+  padding: 10px 12px;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.dept-apps-page__loader {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.dept-apps-page__table-wrap {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+}
+
+.dept-apps-page__table {
+  margin: 0;
+}
+
+.dept-apps-page__linkish {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #c55f4d;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dept-apps-page__linkish:hover {
+  color: #a94e3e;
+}
+
+.dept-apps-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dept-apps-page__empty {
+  text-align: center;
+  color: #666;
+  padding: 24px;
+}

@@ -38,6 +38,18 @@ export default function Breadcrumbs() {
       return [{ label: "Главная" }];
     }
 
+    if (pathname === ROUTES.SIGN_IN) {
+      return [{ label: "Главная", to: "/" }, { label: "Вход" }];
+    }
+
+    if (pathname === ROUTES.SIGN_UP) {
+      return [{ label: "Главная", to: "/" }, { label: "Регистрация" }];
+    }
+
+    if (pathname === ROUTES.DEPARTMENT_APPLICATIONS) {
+      return [{ label: "Главная", to: "/" }, { label: "Заявки" }];
+    }
+
     const deptMatch = matchPath(ROUTES.DEPARTMENT, pathname);
     if (deptMatch?.params.id) {
       const title =

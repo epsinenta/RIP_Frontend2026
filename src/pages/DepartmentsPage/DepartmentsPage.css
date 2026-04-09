@@ -52,12 +52,10 @@
   opacity: 0.72;
 }
 
-.clip-search-section__progress .progress-bar {
-  background-color: #e6ac00;
-}
-
-.clip-search-section__alert {
-  margin-bottom: 12px;
+.clip-search-section__worker-msg {
+  margin: 0 0 12px;
+  font-size: 0.9rem;
+  color: #856404;
 }
 
 .clip-search-section__empty-catalog {
@@ -95,10 +93,6 @@
 .action-btn {
   width: 100%;
   min-height: 42px;
-}
-
-.action-progress {
-  width: 100%;
 }
 
 .clip-search-section__preview-image {

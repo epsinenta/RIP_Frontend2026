@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Alert, Button, ProgressBar } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import Search from "../../components/InputField/InputField";
 import DepartmentsList from "../../components/DepartmentsList/DepartmentsList";
 import CartRow from "../../components/CartRow/CartRow";
@@ -85,8 +85,6 @@ export default function DepartmentsPage() {
 
   const {
     items: clipProcessed,
-    ready: clipReady,
-    progress: clipProgress,
     imageEmbedding,
     workerError,
     searchByImage,
@@ -151,12 +149,7 @@ export default function DepartmentsPage() {
   };
 
   const imageSearchActive = Boolean(imageEmbedding);
-  const showClipProgress =
-    clipSessionActive && clipItems.length > 0 && !clipReady && !workerError;
-  const uploadLabel =
-    clipSessionActive && !clipReady ? "Загрузка нейросети…" : "Загрузить фото";
-  const isUploadDisabled =
-    clipItems.length === 0 || (clipSessionActive && !clipReady);
+  const isUploadDisabled = clipItems.length === 0;
   const canResetImage = Boolean(selectedImage);
 
   const visibleClipRows = imageSearchActive
@@ -180,9 +173,9 @@ export default function DepartmentsPage() {
             </h2>
 
             {workerError ? (
-              <Alert variant="warning" className="clip-search-section__alert">
+              <p className="clip-search-section__worker-msg" role="status">
                 Не удалось загрузить модель или обработать запрос: {workerError}
-              </Alert>
+              </p>
             ) : null}
 
             {clipItems.length === 0 ? (
@@ -214,17 +207,8 @@ export default function DepartmentsPage() {
                     onClick={handleUploadButtonClick}
                     disabled={isUploadDisabled}
                   >
-                    {uploadLabel}
+                    Загрузить фото
                   </Button>
-
-                  {showClipProgress ? (
-                    <ProgressBar
-                      className="action-progress clip-search-section__progress"
-                      now={clipProgress}
-                      label={`${Math.round(clipProgress)}%`}
-                      animated
-                    />
-                  ) : null}
 
                   <Button
                     className="action-btn"
