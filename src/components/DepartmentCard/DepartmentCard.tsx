@@ -46,8 +46,6 @@ export default function DepartmentCard({ department }: { department: Department 
       const result = await addDepartmentToApplication(department.department_id);
       if (result.ok) {
         window.dispatchEvent(new Event(CART_UPDATED));
-      } else {
-        window.alert(result.message ?? "Не удалось добавить отдел в заявку.");
       }
     } finally {
       setAdding(false);

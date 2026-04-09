@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Alert, ProgressBar, Spinner } from "react-bootstrap";
 import {
-  addDepartmentToApplication,
   departmentClipDescription,
   fallbackImageUrl,
   getDepartment,
@@ -32,7 +31,6 @@ export default function DepartmentPage() {
   const [allDepartments, setAllDepartments] = useState<Department[]>([]);
   const [loading, setLoading] = useState(true);
   const [mediaError, setMediaError] = useState(false);
-  const [adding, setAdding] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
@@ -98,21 +96,6 @@ export default function DepartmentPage() {
     return m;
   }, [allDepartments]);
 
-  const handleAdd = async () => {
-    if (!department) return;
-    setAdding(true);
-    try {
-      const result = await addDepartmentToApplication(department.department_id);
-      if (result.ok) {
-        window.dispatchEvent(new Event("department-cart-updated"));
-      } else {
-        window.alert(result.message ?? "Не удалось добавить отдел в заявку.");
-      }
-    } finally {
-      setAdding(false);
-    }
-  };
-
   if (loading) {
     return (
       <div className="vibes-page">
@@ -175,16 +158,6 @@ export default function DepartmentPage() {
               <div className="vibes-manager">
                 <span className="vibes-manager__label">Руководитель</span>
                 <span className="vibes-manager__name">{department.head}</span>
-              </div>
-              <div className="vibes-actions">
-                <button
-                  type="button"
-                  className="search-btn"
-                  onClick={handleAdd}
-                  disabled={adding}
-                >
-                  {adding ? "Добавление…" : "Добавить в заявку"}
-                </button>
               </div>
             </div>
           </div>

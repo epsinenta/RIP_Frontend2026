@@ -99,7 +99,6 @@ export default function DepartmentApplicationPage() {
       direction,
     });
     if (ok) await reloadApplication();
-    else window.alert("Не удалось изменить порядок. Нужна авторизация или ошибка сервера.");
   };
 
   const handleRoleChange = async (item: DepartmentApplicationItemJSON, role: string) => {
@@ -114,7 +113,6 @@ export default function DepartmentApplicationPage() {
       },
     );
     if (ok) await reloadApplication();
-    else window.alert("Не удалось сохранить роль. Нужна авторизация или ошибка сервера.");
   };
 
   const handleDeleteApplication = async (e: React.FormEvent) => {
@@ -123,7 +121,6 @@ export default function DepartmentApplicationPage() {
     if (!window.confirm("Удалить заявку?")) return;
     const ok = await deleteDepartmentApplication(data.department_application.department_application_id);
     if (ok) navigate("/");
-    else window.alert("Не удалось удалить заявку. Нужна авторизация или ошибка сервера.");
   };
 
   if (loading) {
