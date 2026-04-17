@@ -28,7 +28,7 @@ jobs:
 
       - name: Build
         env:
-          VITE_BASE_PATH: /RIP_Frontend2026/
+          VITE_BASE_PATH: /org-structure-frontend/
         run: npm run build
 
       - name: Publish to gh-pages branch
