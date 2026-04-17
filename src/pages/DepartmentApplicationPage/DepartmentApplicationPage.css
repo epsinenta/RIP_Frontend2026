@@ -197,3 +197,18 @@
   margin: 16px 0;
 }
 
+.department-application-page .application-detail__header-card .application-detail__title {
+  margin-bottom: 10px;
+}
+
+.department-application-page .application-detail__header-card .department-application-page__title-field {
+  margin-bottom: 18px;
+  max-width: 560px;
+}
+
+.department-application-page__title-field .form-label {
+  font-weight: 600;
+  color: #2c353d;
+  margin-bottom: 6px;
+}
+

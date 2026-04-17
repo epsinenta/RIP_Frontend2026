@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Button, Spinner } from "react-bootstrap";
+import { Button, Form, Spinner } from "react-bootstrap";
 import {
   editDepartmentInApplication,
   fallbackImageUrl,
@@ -13,6 +13,7 @@ import { DEPARTMENTS_MOCK, MOCK_APPLICATION_DETAIL } from "../../modules/mock";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
   deleteDepartmentApplication as deleteDepartmentApplicationThunk,
+  editDepartmentApplication,
   fetchDepartmentApplicationDetail,
   formDepartmentApplication,
   moveDepartmentInApplication,
@@ -78,6 +79,7 @@ export default function DepartmentApplicationPage() {
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [mockData, setMockData] = useState<DepartmentApplicationDetailPayload | null>(null);
+  const [titleDraft, setTitleDraft] = useState("");
 
   const reloadMock = useCallback(async () => {
     if (!id) return;
@@ -137,6 +139,11 @@ export default function DepartmentApplicationPage() {
   const isDraft = app?.status === "draft";
   const applicationId = app?.department_application_id;
 
+  useEffect(() => {
+    if (!app) return;
+    setTitleDraft(app.title ?? "");
+  }, [applicationId, app?.title]);
+
   const handleMove = async (departmentId: number, direction: "up" | "down") => {
     if (!applicationId || !isDraft) return;
     if (mockData && !detail) {
@@ -170,20 +177,35 @@ export default function DepartmentApplicationPage() {
     );
   };
 
-  const handleForm = () => {
-    if (!applicationId || !isDraft) return;
+  const handleForm = async () => {
+    if (!applicationId || !isDraft || !app) return;
+    const trimmed = titleDraft.trim();
     if (mockData && !detail) {
       setMockData((prev) =>
         prev
           ? {
               ...prev,
-              department_application: { ...prev.department_application, status: "formed" },
+              department_application: {
+                ...prev.department_application,
+                title: trimmed || prev.department_application.title,
+                status: "formed",
+              },
             }
           : null,
       );
       return;
     }
-    void dispatch(formDepartmentApplication(applicationId));
+    try {
+      await dispatch(
+        editDepartmentApplication({
+          applicationId,
+          body: { department_application_id: applicationId, title: trimmed || app.title },
+        }),
+      ).unwrap();
+      await dispatch(formDepartmentApplication(applicationId)).unwrap();
+    } catch {
+      void 0;
+    }
   };
 
   const handleRemoveLine = async (departmentId: number) => {
@@ -247,6 +269,19 @@ export default function DepartmentApplicationPage() {
       <div className="application-detail">
         <div className="application-detail__header-card">
           <h1 className="application-detail__title">Заявка на изменение структуры</h1>
+          {isDraft ? (
+            <Form.Group className="department-application-page__title-field" controlId="application-title">
+              <Form.Label>Название заявки</Form.Label>
+              <Form.Control
+                type="text"
+                value={titleDraft}
+                onChange={(e) => setTitleDraft(e.target.value)}
+                placeholder="Будет сохранено при подтверждении заявки"
+                maxLength={255}
+                disabled={applicationMutationLoading}
+              />
+            </Form.Group>
+          ) : null}
           <div className="application-detail__info">
             <div className="application-detail__info-item">
               <strong>ID:</strong> {applicationId}
@@ -257,6 +292,11 @@ export default function DepartmentApplicationPage() {
             <div className="application-detail__info-item">
               <strong>Отделов:</strong> {sortedItems.length}
             </div>
+            {!isDraft && app.title ? (
+              <div className="application-detail__info-item">
+                <strong>Название:</strong> {app.title}
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -265,10 +305,10 @@ export default function DepartmentApplicationPage() {
             <Button
               type="button"
               className="department-application-page__btn-form"
-              onClick={handleForm}
+              onClick={() => void handleForm()}
               disabled={applicationMutationLoading}
             >
-              Подтвердить заявку (сформировать)
+              Подтвердить заявку
             </Button>
           </div>
         ) : null}

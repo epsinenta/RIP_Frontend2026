@@ -193,6 +193,28 @@ export const removeDepartmentLineFromApplication = createAsyncThunk(
   },
 );
 
+export const editDepartmentApplication = createAsyncThunk(
+  "departmentApplication/editApplication",
+  async (
+    {
+      applicationId,
+      body,
+    }: {
+      applicationId: number;
+      body: WebBackendInternalAppSerializerDepartmentApplicationJSON;
+    },
+    { rejectWithValue, dispatch },
+  ) => {
+    try {
+      await api.departmentApplication.editDepartmentApplicationUpdate(applicationId, body);
+      await dispatch(fetchDepartmentApplicationDetail(applicationId));
+      return true;
+    } catch (e) {
+      return rejectWithValue(apiErrMessage(e));
+    }
+  },
+);
+
 export const formDepartmentApplication = createAsyncThunk(
   "departmentApplication/form",
   async (applicationId: number, { rejectWithValue, dispatch }) => {
@@ -328,6 +350,15 @@ const departmentApplicationSlice = createSlice({
         state.applicationMutationLoading = false;
       })
       .addCase(addDepartmentToApplication.rejected, (state) => {
+        state.applicationMutationLoading = false;
+      })
+      .addCase(editDepartmentApplication.pending, (state) => {
+        state.applicationMutationLoading = true;
+      })
+      .addCase(editDepartmentApplication.fulfilled, (state) => {
+        state.applicationMutationLoading = false;
+      })
+      .addCase(editDepartmentApplication.rejected, (state) => {
         state.applicationMutationLoading = false;
       })
       .addCase(formDepartmentApplication.pending, (state) => {
