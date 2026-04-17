@@ -43,6 +43,18 @@ jobs:
             echo "::error::Для деплоя на GitHub Pages задайте переменную репозитория VITE_API_ORIGIN (HTTPS-URL API, доступный из интернета: VPS/Railway или туннель ngrok/Cloudflare — с https:// страницы github.io нельзя вызывать http://localhost)."
             exit 1
           fi
+          if [[ ! "$VITE_API_ORIGIN" =~ ^https:// ]]; then
+            echo "::error::VITE_API_ORIGIN должен начинаться с https:// (http:// будет заблокирован как mixed content на github.io)."
+            exit 1
+          fi
+          if [[ "$VITE_API_ORIGIN" =~ ^https://(localhost|127\.0\.0\.1|0\.0\.0\.0)(:[0-9]+)?(/|$) ]]; then
+            echo "::error::VITE_API_ORIGIN не может указывать на localhost/127.0.0.1 для GitHub Pages — это браузер не сможет использовать с https://*.github.io."
+            exit 1
+          fi
+          if [[ "$VITE_API_ORIGIN" =~ ^https://[^/]*github\.io(/|$) ]]; then
+            echo "::error::VITE_API_ORIGIN указывает на github.io, из-за этого запросы идут в https://...github.io/api. Укажи публичный HTTPS URL именно backend API."
+            exit 1
+          fi
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
