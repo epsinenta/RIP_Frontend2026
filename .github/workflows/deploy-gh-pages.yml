@@ -29,14 +29,20 @@ jobs:
       - name: Build
         env:
           VITE_BASE_PATH: /org-structure-frontend/
-          VITE_API_ORIGIN: ${{ vars.VITE_API_ORIGIN }}
+          # Пустой origin → в бандле /api; реальный URL подставляет postbuild (runtime-config + патч).
+          VITE_API_ORIGIN: ""
           VITE_MINIO_PUBLIC_BASE: ${{ vars.VITE_MINIO_PUBLIC_BASE }}
+        run: npm run build
+
+      - name: Runtime API for GitHub Pages
+        env:
+          VITE_API_ORIGIN: ${{ vars.VITE_API_ORIGIN }}
         run: |
+          node scripts/postbuild-pages-api.mjs
           if [ -z "$VITE_API_ORIGIN" ]; then
-            echo "::error::Задайте в репозитории GitHub переменную VITE_API_ORIGIN (Settings → Secrets and variables → Actions → Variables): публичный HTTPS-URL API, например https://api.example.com"
+            echo "::error::Для деплоя на GitHub Pages задайте переменную репозитория VITE_API_ORIGIN (HTTPS-URL API, доступный из интернета: VPS/Railway или туннель ngrok/Cloudflare — с https:// страницы github.io нельзя вызывать http://localhost)."
             exit 1
           fi
-          npm run build
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
