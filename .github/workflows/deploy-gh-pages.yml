@@ -29,7 +29,14 @@ jobs:
       - name: Build
         env:
           VITE_BASE_PATH: /org-structure-frontend/
-        run: npm run build
+          VITE_API_ORIGIN: ${{ vars.VITE_API_ORIGIN }}
+          VITE_MINIO_PUBLIC_BASE: ${{ vars.VITE_MINIO_PUBLIC_BASE }}
+        run: |
+          if [ -z "$VITE_API_ORIGIN" ]; then
+            echo "::error::Задайте в репозитории GitHub переменную VITE_API_ORIGIN (Settings → Secrets and variables → Actions → Variables): публичный HTTPS-URL API, например https://api.example.com"
+            exit 1
+          fi
+          npm run build
 
       - name: Publish to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
