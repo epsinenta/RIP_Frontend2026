@@ -5,7 +5,7 @@
   "identifier": "com.rip.frontend.guest",
   "build": {
     "frontendDist": "../dist",
-    "devUrl": "http://localhost:3000",
+    "devUrl": "https://localhost:3000",
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build:tauri"
   },

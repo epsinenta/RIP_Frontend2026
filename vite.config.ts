@@ -1,5 +1,8 @@
+import fs from "node:fs";
+import path from "node:path";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import mkcert from "vite-plugin-mkcert";
 import { VitePWA } from "vite-plugin-pwa";
 
 function normalizeBase(raw: string | undefined): string {
@@ -14,11 +17,19 @@ export default defineConfig(({ mode }) => {
   const base = normalizeBase(env.VITE_BASE_PATH);
   const devApiProxy = env.VITE_DEV_API_PROXY || "http://localhost:8080";
   const pwaName = "1С: Корпоративная структура";
+  const rootDir = process.cwd();
+  const manualCertPath = path.resolve(rootDir, "cert.crt");
+  const manualKeyPath = path.resolve(rootDir, "cert.key");
+  const useManualHttpsCerts =
+    mode === "development" &&
+    fs.existsSync(manualCertPath) &&
+    fs.existsSync(manualKeyPath);
 
   return {
     base,
     plugins: [
       react(),
+      mode === "development" && !useManualHttpsCerts ? mkcert() : null,
       VitePWA({
         registerType: "autoUpdate",
         includeAssets: ["pwa-192.png", "pwa-512.png", "vite.svg"],
@@ -46,8 +57,16 @@ export default defineConfig(({ mode }) => {
           enabled: mode === "development",
         },
       }),
-    ],
+    ].filter(Boolean),
     server: {
+      ...(useManualHttpsCerts
+        ? {
+            https: {
+              cert: fs.readFileSync(manualCertPath),
+              key: fs.readFileSync(manualKeyPath),
+            },
+          }
+        : {}),
       proxy: {
         "/api": {
           target: devApiProxy,
