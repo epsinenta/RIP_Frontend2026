@@ -8,20 +8,17 @@
     <title>1С: Корпоративная структура</title>
     <script>
       (function () {
-        // Personal override: only this browser/device will use custom API origin.
-        // Example values:
-        //   localStorage.setItem("rip.apiOrigin", "http://127.0.0.1:8080")
-        //   localStorage.setItem("rip.apiOrigin", "http://localhost:8080")
-        //   localStorage.setItem("rip.apiOrigin", "http://<zerotier-ip>:8080")
-        //   localStorage.setItem("rip.minioBase", "http://127.0.0.1:9000/test")
-        var raw = localStorage.getItem("rip.apiOrigin") || "";
-        var minio = localStorage.getItem("rip.minioBase") || "";
-        window.__RUNTIME_API_ORIGIN__ = String(raw).replace(/\/$/, "");
-        window.__RUNTIME_MINIO_BASE__ = String(minio).replace(/\/$/, "");
+        // Device-local overrides for GitHub Pages demo
+        // localStorage.setItem("rip.apiOrigin", "http://localhost:8080")
+        // localStorage.setItem("rip.minioBase", "http://localhost:9000/test")
+        var rawApi = localStorage.getItem("rip.apiOrigin") || "";
+        var rawMinio = localStorage.getItem("rip.minioBase") || "";
+        window.__RUNTIME_API_ORIGIN__ = String(rawApi).replace(/\/$/, "");
+        window.__RUNTIME_MINIO_BASE__ = String(rawMinio).replace(/\/$/, "");
       })();
     </script>
-    <script type="module" crossorigin src="/org-structure-frontend/assets/index-BVHPXa-C.js"></script>
-    <link rel="stylesheet" crossorigin href="/org-structure-frontend/assets/index-D6XWbH2m.css">
+    <script type="module" crossorigin src="/org-structure-frontend/assets/index-DQcu897t.js"></script>
+    <link rel="stylesheet" crossorigin href="/org-structure-frontend/assets/index-DOqCYXU6.css">
   <link rel="manifest" href="/org-structure-frontend/manifest.webmanifest"></head>
   <body>
     <div id="root"></div>
