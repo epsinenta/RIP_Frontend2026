@@ -13,8 +13,11 @@
         //   localStorage.setItem("rip.apiOrigin", "http://127.0.0.1:8080")
         //   localStorage.setItem("rip.apiOrigin", "http://localhost:8080")
         //   localStorage.setItem("rip.apiOrigin", "http://<zerotier-ip>:8080")
+        //   localStorage.setItem("rip.minioBase", "http://127.0.0.1:9000/test")
         var raw = localStorage.getItem("rip.apiOrigin") || "";
+        var minio = localStorage.getItem("rip.minioBase") || "";
         window.__RUNTIME_API_ORIGIN__ = String(raw).replace(/\/$/, "");
+        window.__RUNTIME_MINIO_BASE__ = String(minio).replace(/\/$/, "");
       })();
     </script>
     <script type="module" crossorigin src="/org-structure-frontend/assets/index-BVHPXa-C.js"></script>
