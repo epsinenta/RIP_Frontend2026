@@ -15,8 +15,8 @@
     "tauri:precheck": "cargo --version",
     "tauri:dev": "tauri dev",
     "tauri:dev:local": "dotenv -e .env.tauri.local -- tauri dev",
-    "tauri:build": "tauri build",
-    "tauri:build:local": "dotenv -e .env.tauri.local -- npm run tauri:build"
+    "tauri:build": "npm run build:tauri && tauri build",
+    "tauri:build:local": "dotenv -e .env.tauri.local -- npm run build:tauri && tauri build"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.0.1",

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Spinner } from "react-bootstrap";
 import Search from "../../components/InputField/InputField";
 import DepartmentsList from "../../components/DepartmentsList/DepartmentsList";
 import CartRow from "../../components/CartRow/CartRow";
@@ -89,6 +89,9 @@ export default function DepartmentsPage() {
   const {
     items: clipProcessed,
     imageEmbedding,
+    imageEmbeddingPending,
+    ready: clipModelReady,
+    progress: clipModelProgress,
     workerError,
     searchByImage,
     resetSearch,
@@ -154,6 +157,14 @@ export default function DepartmentsPage() {
   const imageSearchActive = Boolean(imageEmbedding);
   const isUploadDisabled = clipItems.length === 0;
   const canResetImage = Boolean(selectedImage);
+  const clipModelLoading =
+    clipSessionActive && clipItems.length > 0 && !clipModelReady && !workerError;
+  const clipImageProcessing =
+    Boolean(selectedImage) &&
+    clipModelReady &&
+    imageEmbeddingPending &&
+    !imageEmbedding &&
+    !workerError;
 
   const visibleClipRows = imageSearchActive
     ? clipProcessed.filter((item) => item.isVisible)
@@ -226,6 +237,20 @@ export default function DepartmentsPage() {
                     Сбросить
                   </Button>
                 </div>
+
+                {clipModelLoading ? (
+                  <p className="clip-search-section__processing" role="status" aria-live="polite">
+                    <Spinner animation="border" size="sm" role="presentation" />
+                    <span>Подготовка модели и каталога… {clipModelProgress}%</span>
+                  </p>
+                ) : null}
+
+                {clipImageProcessing ? (
+                  <p className="clip-search-section__processing" role="status" aria-live="polite">
+                    <Spinner animation="border" size="sm" role="presentation" />
+                    <span>Идёт обработка изображения…</span>
+                  </p>
+                ) : null}
               </div>
             )}
           </section>

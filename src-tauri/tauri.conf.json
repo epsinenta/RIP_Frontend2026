@@ -7,7 +7,7 @@
     "frontendDist": "../dist",
     "devUrl": "https://localhost:3000",
     "beforeDevCommand": "npm run dev",
-    "beforeBuildCommand": "npm run build:tauri"
+    "beforeBuildCommand": null
   },
   "app": {
     "windows": [

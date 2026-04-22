@@ -27,6 +27,7 @@ export const useDepartmentImageSearch = (
 ) => {
   const [items, setItems] = useState<IProcessedClipItem[]>([]);
   const [imageEmbedding, setImageEmbedding] = useState<number[] | null>(null);
+  const [imageEmbeddingPending, setImageEmbeddingPending] = useState(false);
   const [ready, setReady] = useState(false);
   const [progress, setProgress] = useState(0);
   const [workerError, setWorkerError] = useState<string | null>(null);
@@ -46,6 +47,7 @@ export const useDepartmentImageSearch = (
     setWorkerError(null);
     embeddingsReadyRef.current = false;
     pendingFileRef.current = null;
+    setImageEmbeddingPending(false);
 
     if (!enabled) {
       workerRef.current?.terminate();
@@ -113,11 +115,13 @@ export const useDepartmentImageSearch = (
           break;
         case "image_embedding_ready":
           setImageEmbedding(data as number[]);
+          setImageEmbeddingPending(false);
           break;
         case "error":
           setWorkerError(typeof data === "string" ? data : "Worker error");
           setReady(true);
           pendingFileRef.current = null;
+          setImageEmbeddingPending(false);
           break;
         default:
           break;
@@ -159,6 +163,7 @@ export const useDepartmentImageSearch = (
   }, [imageEmbedding]);
 
   const searchByImage = (file: File) => {
+    setImageEmbeddingPending(true);
     if (!workerRef.current || !embeddingsReadyRef.current) {
       pendingFileRef.current = file;
       return;
@@ -168,6 +173,7 @@ export const useDepartmentImageSearch = (
 
   const resetSearch = () => {
     setImageEmbedding(null);
+    setImageEmbeddingPending(false);
     setWorkerError(null);
     pendingFileRef.current = null;
     setItems((prev) => {
@@ -185,6 +191,7 @@ export const useDepartmentImageSearch = (
     ready,
     progress,
     imageEmbedding,
+    imageEmbeddingPending,
     workerError,
     searchByImage,
     resetSearch,

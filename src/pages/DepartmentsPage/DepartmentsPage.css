@@ -58,6 +58,17 @@
   color: #856404;
 }
 
+.clip-search-section__processing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 0;
+  width: 100%;
+  font-size: 0.95rem;
+  color: #2c353d;
+  font-weight: 500;
+}
+
 .clip-search-section__empty-catalog {
   margin: 0;
   font-size: 0.9rem;
