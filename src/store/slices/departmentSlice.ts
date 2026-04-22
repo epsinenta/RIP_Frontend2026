@@ -3,7 +3,6 @@ import type { Department } from "../../modules/departmentsApi";
 import { api } from "../../api";
 import { apiErrMessage } from "../utils/apiError";
 
-/** Каталог для CLIP; при текстовом поиске список отображения может отличаться. */
 export interface DepartmentsState {
   catalogDepartments: Department[];
   displayDepartments: Department[];
@@ -20,10 +19,6 @@ const initialState: DepartmentsState = {
   useMock: false,
 };
 
-/**
- * Альтернативный путь через сгенерированный клиент (как fetchDevices в примере elecalc).
- * Страница каталога по умолчанию использует listDepartments из modules — поведение как в DevicesPage.
- */
 export const fetchDepartments = createAsyncThunk(
   "departments/fetchDepartments",
   async (searchTitle: string | undefined, { rejectWithValue }) => {

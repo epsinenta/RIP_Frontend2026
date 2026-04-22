@@ -8,9 +8,6 @@
     <title>1С: Корпоративная структура</title>
     <script>
       (function () {
-        // Device-local overrides for GitHub Pages demo
-        // localStorage.setItem("rip.apiOrigin", "http://localhost:8080")
-        // localStorage.setItem("rip.minioBase", "http://localhost:9000/test")
         var rawApi = localStorage.getItem("rip.apiOrigin") || "";
         var rawMinio = localStorage.getItem("rip.minioBase") || "";
         window.__RUNTIME_API_ORIGIN__ = String(rawApi).replace(/\/$/, "");

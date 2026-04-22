@@ -1,8 +1,3 @@
-/**
- * GitHub Pages: при пустом VITE_API_ORIGIN в бандле baseURL = "/api" → запросы на github.io/api.
- * Пишем dist/runtime-config.json, в index.html — синхронная загрузка в window.__RUNTIME_API_ORIGIN__,
- * в index-*.js — подмена `const <id>="...".replace(/\/$/,"")??""` на чтение window.
- */
 import fs from "node:fs";
 import path from "node:path";
 
