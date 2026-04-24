@@ -1,14 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Spinner, Table, Button, Form } from "react-bootstrap";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { setListFilters } from "../../store/slices/departmentApplicationSlice";
 import {
   fetchDepartmentApplicationsList,
   finishDepartmentApplication,
-  setListFilters,
-} from "../../store/slices/departmentApplicationSlice";
+} from "../../store/thunks/departmentApplicationThunks";
 import { ROUTES } from "../../Routes";
+import RequestBlockingOverlay from "../../components/RequestBlockingOverlay/RequestBlockingOverlay";
+import { useShortPolling } from "../../hooks/useShortPolling";
 import "./DepartmentApplicationsPage.css";
+
+const DEPARTMENT_APPLICATIONS_POLL_MS = 4000;
 
 function statusLabel(s: string | undefined): string {
   const m: Record<string, string> = {
@@ -39,19 +43,19 @@ export default function DepartmentApplicationsPage() {
     setDraftStatus(filters.status);
   }, [filters.fromDate, filters.toDate, filters.status]);
 
-  const load = useCallback(() => {
-    void dispatch(fetchDepartmentApplicationsList());
-  }, [dispatch]);
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate(ROUTES.SIGN_IN, { replace: true });
-      return;
     }
-    load();
-    const id = window.setInterval(load, 4000);
-    return () => window.clearInterval(id);
-  }, [isAuthenticated, navigate, load]);
+  }, [isAuthenticated, navigate]);
+
+  useShortPolling(
+    () => {
+      void dispatch(fetchDepartmentApplicationsList());
+    },
+    isAuthenticated,
+    DEPARTMENT_APPLICATIONS_POLL_MS,
+  );
 
   const visible = useMemo(() => {
     const q = creatorFilter.trim().toLowerCase();
@@ -74,11 +78,14 @@ export default function DepartmentApplicationsPage() {
     if (id != null) navigate(`/department_application/${id}`);
   };
 
+  const mutationOverlay = Object.keys(itemMutationLoading).length > 0;
+
   if (!isAuthenticated) return null;
 
   return (
     <div className="dept-apps-page">
-      <div className="dept-apps-page__inner">
+      <div className="dept-apps-page__inner dept-apps-page__inner--relative">
+        <RequestBlockingOverlay active={mutationOverlay} />
         <h1 className="dept-apps-page__heading">
           {isModerator ? "Заявки (модератор)" : "Мои заявки"}
         </h1>
@@ -91,6 +98,7 @@ export default function DepartmentApplicationsPage() {
                 type="date"
                 value={draftFrom}
                 onChange={(e) => setDraftFrom(e.target.value)}
+                disabled={mutationOverlay}
               />
             </Form.Group>
             <Form.Group className="dept-apps-page__fg">
@@ -99,6 +107,7 @@ export default function DepartmentApplicationsPage() {
                 type="date"
                 value={draftTo}
                 onChange={(e) => setDraftTo(e.target.value)}
+                disabled={mutationOverlay}
               />
             </Form.Group>
             <Form.Group className="dept-apps-page__fg">
@@ -106,6 +115,7 @@ export default function DepartmentApplicationsPage() {
               <Form.Select
                 value={draftStatus}
                 onChange={(e) => setDraftStatus(e.target.value)}
+                disabled={mutationOverlay}
               >
                 <option value="">Все</option>
                 <option value="formed">Сформирована</option>
@@ -121,11 +131,16 @@ export default function DepartmentApplicationsPage() {
                   value={creatorFilter}
                   onChange={(e) => setCreatorFilter(e.target.value)}
                   placeholder="Часть логина"
+                  disabled={mutationOverlay}
                 />
               </Form.Group>
             ) : null}
           </div>
-          <Button className="dept-apps-page__apply" onClick={handleApplyFilters}>
+          <Button
+            className="dept-apps-page__apply"
+            onClick={handleApplyFilters}
+            disabled={listLoading || mutationOverlay}
+          >
             Применить фильтры
           </Button>
         </section>
@@ -153,17 +168,18 @@ export default function DepartmentApplicationsPage() {
               </tr>
             </thead>
             <tbody>
-              {visible.map((row) => {
+              {visible.map((row, rowIdx) => {
                 const id = row.department_application_id;
                 const finKey = id != null ? `finish-${id}` : "";
                 const finBusy = finKey ? Boolean(itemMutationLoading[finKey]) : false;
                 return (
-                  <tr key={id ?? Math.random()}>
+                  <tr key={id != null ? String(id) : `row-${rowIdx}`}>
                     <td>
                       <button
                         type="button"
                         className="dept-apps-page__linkish"
                         onClick={() => goApp(id)}
+                        disabled={mutationOverlay}
                       >
                         {id}
                       </button>

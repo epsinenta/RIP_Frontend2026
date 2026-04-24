@@ -2,7 +2,7 @@ import "./CartRow.css";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { fetchDepartmentApplicationCart } from "../../store/slices/departmentApplicationSlice";
+import { fetchDepartmentApplicationCart } from "../../store/thunks/departmentApplicationThunks";
 
 export default function CartRow() {
   const dispatch = useAppDispatch();

@@ -1,4 +1,4 @@
-import { apiUrl } from "./apiUrl";
+import { publicApiAxios } from "./apiAxios";
 
 const MINIO_PUBLIC_BASE =
   (import.meta.env.VITE_MINIO_PUBLIC_BASE?.replace(/\/$/, "") as string | undefined) ??
@@ -71,44 +71,13 @@ export function fallbackImageUrl(): string {
   );
 }
 
-export async function getDepartmentApplicationCart(): Promise<DepartmentApplicationCart> {
-  try {
-    const res = await fetch(apiUrl("/api/department_application/department_application-cart"), {
-      headers: { Accept: "application/json" },
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch {
-    return { has_draft: false, departments_count: 0 };
-  }
-}
-
-export async function getDepartmentApplication(
-  id: number,
-): Promise<DepartmentApplicationDetailResponse | null> {
-  const headers: Record<string, string> = { Accept: "application/json" };
-  const token = localStorage.getItem("token");
-  if (token) headers["Authorization"] = `Bearer ${token}`;
-  try {
-    const res = await fetch(apiUrl(`/api/department_application/${id}`), { headers });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
-  } catch {
-    return null;
-  }
-}
-
 export async function listDepartments(params?: { title?: string }): Promise<Department[]> {
   try {
-    let path = "/api/departments";
-    if (params?.title) {
-      const q = new URLSearchParams();
-      q.append("Title", params.title);
-      path += `?${q.toString()}`;
-    }
-    const res = await fetch(apiUrl(path), { headers: { Accept: "application/json" } });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    const r = await publicApiAxios.get<Department[]>("/departments", {
+      params: params?.title ? { Title: params.title } : undefined,
+      headers: { Accept: "application/json" },
+    });
+    return r.data ?? [];
   } catch {
     return [];
   }
@@ -116,86 +85,11 @@ export async function listDepartments(params?: { title?: string }): Promise<Depa
 
 export async function getDepartment(id: number): Promise<Department | null> {
   try {
-    const res = await fetch(apiUrl(`/api/department/${id}`), {
+    const r = await publicApiAxios.get<Department>(`/department/${id}`, {
       headers: { Accept: "application/json" },
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return await res.json();
+    return r.data ?? null;
   } catch {
     return null;
-  }
-}
-
-export async function addDepartmentToApplication(
-  departmentId: number,
-): Promise<{ ok: true } | { ok: false; status: number; message?: string }> {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    return { ok: false, status: 401 };
-  }
-  try {
-    const res = await fetch(apiUrl(`/api/dep_app_dep/add/${departmentId}`), {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (res.ok || res.status === 201) return { ok: true };
-    let message: string | undefined;
-    try {
-      const j = (await res.json()) as { error?: string; message?: string };
-      message = j.error ?? j.message;
-    } catch {
-      message = await res.text();
-    }
-    return { ok: false, status: res.status, message: message || `HTTP ${res.status}` };
-  } catch {
-    return { ok: false, status: 0, message: "Не удалось выполнить запрос." };
-  }
-}
-
-export async function editDepartmentInApplication(
-  departmentId: number,
-  applicationId: number,
-  body: {
-    direction?: "up" | "down";
-    role?: string;
-    sort_order?: number;
-    salary?: number | null;
-  },
-): Promise<boolean> {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  try {
-    const res = await fetch(apiUrl(`/api/dep_app_dep/${departmentId}/${applicationId}`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
-    return res.ok;
-  } catch {
-    return false;
-  }
-}
-
-export async function deleteDepartmentApplication(applicationId: number): Promise<boolean> {
-  const token = localStorage.getItem("token");
-  if (!token) return false;
-  try {
-    const res = await fetch(
-      apiUrl(`/api/department_application/${applicationId}/delete-department_application`),
-      {
-        method: "DELETE",
-        headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
-      },
-    );
-    return res.ok;
-  } catch {
-    return false;
   }
 }

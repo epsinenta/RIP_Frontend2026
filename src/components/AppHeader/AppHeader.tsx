@@ -2,7 +2,9 @@ import { type MouseEvent } from "react";
 import { Link, NavLink } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { logoutUser } from "../../store/slices/userSlice";
+import { clearSession } from "../../store/slices/userSlice";
+import { resetDepartmentApplicationState } from "../../store/slices/departmentApplicationSlice";
+import { signOutRequest } from "../../modules/authApi";
 import { ROUTES } from "../../Routes";
 import "./AppHeader.css";
 
@@ -19,7 +21,15 @@ export default function AppHeader() {
   };
 
   const handleLogout = () => {
-    void dispatch(logoutUser());
+    void (async () => {
+      try {
+        await signOutRequest();
+      } catch {
+        void 0;
+      }
+      dispatch(clearSession());
+      dispatch(resetDepartmentApplicationState());
+    })();
   };
 
   return (

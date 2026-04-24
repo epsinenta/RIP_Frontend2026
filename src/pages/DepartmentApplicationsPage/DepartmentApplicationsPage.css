@@ -7,6 +7,10 @@
   margin: 0 auto;
 }
 
+.dept-apps-page__inner--relative {
+  position: relative;
+}
+
 .dept-apps-page__heading {
   margin: 20px 0 8px;
   font-size: 1.5rem;

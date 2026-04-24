@@ -2,15 +2,20 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loginUser } from "../../store/slices/userSlice";
+import { setSession } from "../../store/slices/userSlice";
+import { signInRequest } from "../../modules/authApi";
+import { parseIsModeratorFromToken } from "../../store/utils/jwt";
+import { apiErrMessage } from "../../store/utils/apiError";
 import { ROUTES } from "../../Routes";
 import "./SignInPage.css";
 
 export default function SignInPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, isAuthenticated } = useAppSelector((s) => s.user);
+  const { isAuthenticated } = useAppSelector((s) => s.user);
   const [form, setForm] = useState({ login: "", password: "" });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) navigate(ROUTES.DEPARTMENTS, { replace: true });
@@ -19,11 +24,22 @@ export default function SignInPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.login || !form.password) return;
+    setLoading(true);
+    setError(null);
     try {
-      await dispatch(loginUser(form)).unwrap();
+      await signInRequest(form);
+      const token = localStorage.getItem("token") ?? "";
+      dispatch(
+        setSession({
+          username: form.login,
+          isModerator: parseIsModeratorFromToken(token),
+        }),
+      );
       navigate(ROUTES.DEPARTMENTS, { replace: true });
-    } catch {
-      void 0;
+    } catch (err) {
+      setError(apiErrMessage(err));
+    } finally {
+      setLoading(false);
     }
   };
 

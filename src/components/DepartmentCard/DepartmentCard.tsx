@@ -4,7 +4,7 @@ import type { Department } from "../../modules/departmentsApi";
 import { fallbackImageUrl, objectUrlFromKey } from "../../modules/departmentsApi";
 import "./DepartmentCard.css";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { addDepartmentToApplication as addDepartmentToApplicationThunk } from "../../store/slices/departmentApplicationSlice";
+import { addDepartmentToApplication } from "../../store/thunks/departmentApplicationThunks";
 
 const CART_UPDATED = "department-cart-updated";
 
@@ -47,7 +47,7 @@ export default function DepartmentCard({ department }: { department: Department 
     if (!isAuthenticated) return;
     setAdding(true);
     try {
-      await dispatch(addDepartmentToApplicationThunk(department.department_id)).unwrap();
+      await dispatch(addDepartmentToApplication(department.department_id));
       window.dispatchEvent(new Event(CART_UPDATED));
     } catch {
       void 0;

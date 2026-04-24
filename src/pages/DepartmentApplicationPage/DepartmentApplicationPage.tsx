@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Form, Spinner } from "react-bootstrap";
 import {
-  editDepartmentInApplication,
   fallbackImageUrl,
   listDepartments,
   objectUrlFromKey,
@@ -12,20 +11,21 @@ import {
 import { DEPARTMENTS_MOCK, MOCK_APPLICATION_DETAIL } from "../../modules/mock";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
-  deleteDepartmentApplication as deleteDepartmentApplicationThunk,
+  deleteDepartmentApplication,
   editDepartmentApplication,
   fetchDepartmentApplicationDetail,
   formDepartmentApplication,
   moveDepartmentInApplication,
   removeDepartmentLineFromApplication,
   updateDepartmentLineInApplication,
-  type DepartmentApplicationDetailPayload,
-} from "../../store/slices/departmentApplicationSlice";
+} from "../../store/thunks/departmentApplicationThunks";
+import type { DepartmentApplicationDetailPayload } from "../../store/slices/departmentApplicationSlice";
 import { ROUTES } from "../../Routes";
 import type {
   WebBackendInternalAppSerializerDepartmentApplicationDepartmentJSON,
   WebBackendInternalAppSerializerDepartmentApplicationJSON,
 } from "../../api/Api";
+import RequestBlockingOverlay from "../../components/RequestBlockingOverlay/RequestBlockingOverlay";
 import "./DepartmentApplicationPage.css";
 
 const ROLE_OPTIONS = ["Головной", "Руководящий", "Подчинённый"] as const;
@@ -69,14 +69,40 @@ function toItemJson(row: DepartmentApplicationDetailPayload["items"][0]): Depart
   };
 }
 
+function swapMockLineOrder(
+  items: WebBackendInternalAppSerializerDepartmentApplicationDepartmentJSON[],
+  departmentId: number,
+  direction: "up" | "down",
+): WebBackendInternalAppSerializerDepartmentApplicationDepartmentJSON[] {
+  const sorted = [...items].sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  const idx = sorted.findIndex((i) => (i.department_id ?? 0) === departmentId);
+  if (idx < 0) return items;
+  const swapWith = direction === "up" ? idx - 1 : idx + 1;
+  if (swapWith < 0 || swapWith >= sorted.length) return items;
+  const soA = sorted[idx].sort_order ?? idx + 1;
+  const soB = sorted[swapWith].sort_order ?? swapWith + 1;
+  const idA = sorted[idx].department_id ?? 0;
+  const idB = sorted[swapWith].department_id ?? 0;
+  return items.map((it) => {
+    const id = it.department_id ?? 0;
+    if (id === idA) return { ...it, sort_order: soB };
+    if (id === idB) return { ...it, sort_order: soA };
+    return it;
+  });
+}
+
 export default function DepartmentApplicationPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAppSelector((s) => s.user);
-  const { detail, detailLoading, applicationMutationLoading, itemMutationLoading } = useAppSelector(
-    (s) => s.departmentApplication,
-  );
+  const {
+    detail,
+    detailLoading,
+    applicationMutationLoading,
+    itemMutationLoading,
+    tableMutationBusy,
+  } = useAppSelector((s) => s.departmentApplication);
 
   const [departments, setDepartments] = useState<Department[]>([]);
   const [mockData, setMockData] = useState<DepartmentApplicationDetailPayload | null>(null);
@@ -110,10 +136,8 @@ export default function DepartmentApplicationPage() {
   useEffect(() => {
     if (!id || !isAuthenticated) return;
     setMockData(null);
-    void dispatch(fetchDepartmentApplicationDetail(Number(id))).then((a) => {
-      if (fetchDepartmentApplicationDetail.rejected.match(a)) {
-        void reloadMock();
-      }
+    void dispatch(fetchDepartmentApplicationDetail(Number(id))).then((ok) => {
+      if (ok !== true) void reloadMock();
     });
   }, [id, isAuthenticated, dispatch, reloadMock]);
 
@@ -144,37 +168,95 @@ export default function DepartmentApplicationPage() {
     setTitleDraft(app.title ?? "");
   }, [applicationId, app?.title]);
 
+  const controlsLocked =
+    applicationMutationLoading ||
+    tableMutationBusy ||
+    Object.keys(itemMutationLoading).length > 0;
+
   const handleMove = async (departmentId: number, direction: "up" | "down") => {
     if (!applicationId || !isDraft) return;
     if (mockData && !detail) {
-      const ok = await editDepartmentInApplication(departmentId, applicationId, { direction });
-      if (ok) void reloadMock();
+      setMockData((prev) =>
+        prev
+          ? {
+              ...prev,
+              items: swapMockLineOrder(prev.items, departmentId, direction),
+            }
+          : null,
+      );
       return;
     }
-    void dispatch(moveDepartmentInApplication({ departmentId, applicationId, direction }));
+    try {
+      await dispatch(
+        moveDepartmentInApplication({ departmentId, applicationId, direction }),
+      );
+    } catch {
+      void 0;
+    }
   };
 
-  const handleRoleChange = async (item: DepartmentApplicationDetailPayload["items"][0], role: string) => {
+  const handleRoleChange = async (
+    item: DepartmentApplicationDetailPayload["items"][0],
+    role: string,
+  ) => {
     if (!applicationId || !isDraft) return;
     const row = toItemJson(item);
     if (mockData && !detail) {
-      const ok = await editDepartmentInApplication(item.department_id ?? 0, applicationId, {
-        role,
-        sort_order: row.sort_order,
-      });
-      if (ok) void reloadMock();
+      setMockData((prev) =>
+        prev
+          ? {
+              ...prev,
+              items: prev.items.map((i) =>
+                (i.department_id ?? 0) === (item.department_id ?? 0) ? { ...i, role } : i,
+              ),
+            }
+          : null,
+      );
       return;
     }
-    void dispatch(
-      updateDepartmentLineInApplication({
-        departmentId: item.department_id ?? 0,
-        applicationId,
-        body: {
-          role,
-          sort_order: row.sort_order,
-        },
-      }),
-    );
+    try {
+      await dispatch(
+        updateDepartmentLineInApplication({
+          departmentId: item.department_id ?? 0,
+          applicationId,
+          body: {
+            role,
+            sort_order: row.sort_order,
+          },
+        }),
+      );
+    } catch {
+      void 0;
+    }
+  };
+
+  const handleSaveTitle = async () => {
+    if (!applicationId || !isDraft || !app) return;
+    const trimmed = titleDraft.trim();
+    if (mockData && !detail) {
+      setMockData((prev) =>
+        prev
+          ? {
+              ...prev,
+              department_application: {
+                ...prev.department_application,
+                title: trimmed || prev.department_application.title,
+              },
+            }
+          : null,
+      );
+      return;
+    }
+    try {
+      await dispatch(
+        editDepartmentApplication({
+          applicationId,
+          body: { department_application_id: applicationId, title: trimmed || app.title },
+        }),
+      );
+    } catch {
+      void 0;
+    }
   };
 
   const handleForm = async () => {
@@ -201,8 +283,8 @@ export default function DepartmentApplicationPage() {
           applicationId,
           body: { department_application_id: applicationId, title: trimmed || app.title },
         }),
-      ).unwrap();
-      await dispatch(formDepartmentApplication(applicationId)).unwrap();
+      );
+      await dispatch(formDepartmentApplication(applicationId));
     } catch {
       void 0;
     }
@@ -218,9 +300,7 @@ export default function DepartmentApplicationPage() {
       return;
     }
     try {
-      await dispatch(
-        removeDepartmentLineFromApplication({ departmentId, applicationId }),
-      ).unwrap();
+      await dispatch(removeDepartmentLineFromApplication({ departmentId, applicationId }));
     } catch {
       void 0;
     }
@@ -235,7 +315,7 @@ export default function DepartmentApplicationPage() {
       return;
     }
     try {
-      await dispatch(deleteDepartmentApplicationThunk(applicationId)).unwrap();
+      await dispatch(deleteDepartmentApplication(applicationId));
       navigate("/");
     } catch {
       void 0;
@@ -264,8 +344,15 @@ export default function DepartmentApplicationPage() {
     );
   }
 
+  const overlayActive =
+    (detailLoading && Boolean(data)) ||
+    applicationMutationLoading ||
+    tableMutationBusy ||
+    Object.keys(itemMutationLoading).length > 0;
+
   return (
-    <div className="department-application-page">
+    <div className="department-application-page department-application-page--relative">
+      <RequestBlockingOverlay active={overlayActive} />
       <div className="application-detail">
         <div className="application-detail__header-card">
           <h1 className="application-detail__title">Заявка на изменение структуры</h1>
@@ -276,10 +363,20 @@ export default function DepartmentApplicationPage() {
                 type="text"
                 value={titleDraft}
                 onChange={(e) => setTitleDraft(e.target.value)}
-                placeholder="Будет сохранено при подтверждении заявки"
+                placeholder="Сохраняется кнопкой ниже или при подтверждении заявки"
                 maxLength={255}
-                disabled={applicationMutationLoading}
+                disabled={controlsLocked}
               />
+              <div className="department-application-page__title-actions">
+                <button
+                  type="button"
+                  className="search-btn department-application-page__delete-btn"
+                  onClick={() => void handleSaveTitle()}
+                  disabled={controlsLocked}
+                >
+                  Сохранить название
+                </button>
+              </div>
             </Form.Group>
           ) : null}
           <div className="application-detail__info">
@@ -306,7 +403,7 @@ export default function DepartmentApplicationPage() {
               type="button"
               className="department-application-page__btn-form"
               onClick={() => void handleForm()}
-              disabled={applicationMutationLoading}
+              disabled={controlsLocked}
             >
               Подтвердить заявку
             </Button>
@@ -349,7 +446,7 @@ export default function DepartmentApplicationPage() {
                         <button
                           type="button"
                           className="move-btn"
-                          disabled={!isDraft || idx === 0}
+                          disabled={!isDraft || idx === 0 || controlsLocked}
                           title="Выше"
                           onClick={() => void handleMove(did, "up")}
                         >
@@ -358,7 +455,9 @@ export default function DepartmentApplicationPage() {
                         <button
                           type="button"
                           className="move-btn"
-                          disabled={!isDraft || idx === sortedItems.length - 1}
+                          disabled={
+                            !isDraft || idx === sortedItems.length - 1 || controlsLocked
+                          }
                           title="Ниже"
                           onClick={() => void handleMove(did, "down")}
                         >
@@ -383,6 +482,7 @@ export default function DepartmentApplicationPage() {
                             className="role-select"
                             value={roleForSelect(item.role ?? "")}
                             onChange={(e) => void handleRoleChange(item, e.target.value)}
+                            disabled={controlsLocked}
                           >
                             {ROLE_OPTIONS.map((opt) => (
                               <option key={opt} value={opt}>
@@ -401,7 +501,7 @@ export default function DepartmentApplicationPage() {
                         <button
                           type="button"
                           className="department-application-page__btn-remove-line"
-                          disabled={Boolean(itemMutationLoading[`rm-${did}`])}
+                          disabled={controlsLocked}
                           onClick={() => void handleRemoveLine(did)}
                         >
                           Удалить
@@ -419,7 +519,11 @@ export default function DepartmentApplicationPage() {
 
         {isDraft ? (
           <form className="department-application-page__delete-form" onSubmit={handleDeleteApplication}>
-            <button type="submit" className="search-btn department-application-page__delete-btn">
+            <button
+              type="submit"
+              className="search-btn department-application-page__delete-btn"
+              disabled={controlsLocked}
+            >
               Удалить заявку
             </button>
           </form>

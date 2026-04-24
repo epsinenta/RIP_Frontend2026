@@ -1,3 +1,7 @@
+.department-application-page--relative {
+  position: relative;
+}
+
 .device-page-loader {
   display: flex;
   justify-content: center;
@@ -222,5 +226,9 @@
   font-weight: 600;
   color: #2c353d;
   margin-bottom: 6px;
+}
+
+.department-application-page__title-actions {
+  margin-top: 10px;
 }
 
