@@ -1,0 +1,234 @@
+.department-application-page--relative {
+  position: relative;
+}
+
+.device-page-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 240px;
+}
+
+.application-not-found {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 20px;
+  text-align: center;
+  color: #555;
+}
+
+.department-application-page .application-detail {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 0 20px 40px;
+  box-sizing: border-box;
+}
+
+.department-application-page__table-wrap.app-table-wrapper {
+  position: relative;
+  width: 100%;
+  left: auto;
+  right: auto;
+  margin-left: 0;
+  margin-right: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .department-application-page__table-wrap.app-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  }
+
+  .department-application-page__table-wrap .app-table {
+    min-width: 820px;
+  }
+}
+
+.department-application-page__table-wrap .app-table thead tr {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 12px;
+}
+
+.department-application-page__table-wrap .app-table thead th {
+  font-weight: 600;
+  color: #2c353d;
+}
+
+.department-application-page__table-wrap .app-table thead .app-table__col-employees {
+  position: relative;
+  left: -8px;
+}
+
+.department-application-page__table-wrap .app-table__col-order {
+  min-width: 56px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.department-application-page__table-wrap .app-table__col-remove {
+  min-width: 108px;
+  width: 1%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.department-application-page__btn-remove-line {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #c55f4d;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #c55f4d;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    border-color 0.15s ease,
+    opacity 0.15s ease;
+}
+
+.department-application-page__btn-remove-line:hover:not(:disabled) {
+  background: #fef6f4;
+  color: #a94e3e;
+  border-color: #a94e3e;
+}
+
+.department-application-page__btn-remove-line:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.order-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.move-btn {
+  min-width: 36px;
+  padding: 4px 8px;
+  font-size: 14px;
+  line-height: 1.2;
+  border: 1px solid #f0b000;
+  border-radius: 6px;
+  background: #ffeb3b;
+  color: #4a3b00;
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease, opacity 0.15s ease;
+}
+
+.move-btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.move-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.3);
+}
+
+.role-form {
+  display: flex;
+  align-items: center;
+}
+
+.role-select {
+  max-width: 100%;
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border: 1px solid #e6ac00;
+  border-radius: 8px;
+  background: #ffeb3b;
+  color: #3e2723;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+
+.role-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.65);
+}
+
+.department-application-page__table-wrap .app-table tbody tr.hierarchy-level-2 {
+  width: calc(100% - 72px);
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.department-application-page__table-wrap .app-table tbody tr.hierarchy-level-3 {
+  width: calc(100% - 120px);
+  margin-left: auto;
+  margin-right: 0;
+}
+
+.department-application-page__delete-form {
+  margin-top: 24px;
+}
+
+.department-application-page__delete-btn {
+  background-color: #c55f4d !important;
+}
+
+.department-application-page__delete-btn:hover {
+  background-color: #a94e3e !important;
+}
+
+.department-application-page__btn-form {
+  border-color: #e6ac00 !important;
+  background-color: #ffeb3b !important;
+  color: #2c353d !important;
+  font-weight: 600;
+}
+
+.department-application-page__btn-form:hover:not(:disabled) {
+  background-color: #ffe022 !important;
+  border-color: #d9a000 !important;
+  color: #1a1a1a !important;
+}
+
+.department-application-page__btn-form:disabled {
+  opacity: 0.72;
+}
+
+@media (max-width: 640px) {
+  .department-application-page__table-wrap .app-table tbody tr.hierarchy-level-2 {
+    width: calc(100% - 40px);
+  }
+
+  .department-application-page__table-wrap .app-table tbody tr.hierarchy-level-3 {
+    width: calc(100% - 64px);
+  }
+
+}
+
+.department-application-page__actions {
+  margin: 16px 0;
+}
+
+.department-application-page .application-detail__header-card .application-detail__title {
+  margin-bottom: 10px;
+}
+
+.department-application-page .application-detail__header-card .department-application-page__title-field {
+  margin-bottom: 18px;
+  max-width: 560px;
+}
+
+.department-application-page__title-field .form-label {
+  font-weight: 600;
+  color: #2c353d;
+  margin-bottom: 6px;
+}
+
+.department-application-page__title-actions {
+  margin-top: 10px;
+}
+

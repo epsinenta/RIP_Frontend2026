@@ -2,22 +2,13 @@
 <html lang="ru">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/org-structure-frontend/vite.svg" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="theme-color" content="#c55f4d" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>1С: Корпоративная структура</title>
-    <script>
-      (function () {
-        var rawApi = localStorage.getItem("rip.apiOrigin") || "";
-        var rawMinio = localStorage.getItem("rip.minioBase") || "";
-        window.__RUNTIME_API_ORIGIN__ = String(rawApi).replace(/\/$/, "");
-        window.__RUNTIME_MINIO_BASE__ = String(rawMinio).replace(/\/$/, "");
-      })();
-    </script>
-    <script type="module" crossorigin src="/org-structure-frontend/assets/index-DQcu897t.js"></script>
-    <link rel="stylesheet" crossorigin href="/org-structure-frontend/assets/index-DOqCYXU6.css">
-  <link rel="manifest" href="/org-structure-frontend/manifest.webmanifest"></head>
+  </head>
   <body>
     <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -11,7 +11,14 @@ node_modules
 dist
 dist-ssr
 *.local
+.env.production
 .env.tauri.local
+
+# Local HTTPS dev certs (do not commit private keys)
+cert.key
+ca.key
+cert.crt
+ca.crt
 
 # Editor directories and files
 .vscode/*
