@@ -1,20 +1,18 @@
 # AI_NOTES
 
 ## Что сделано
-- Исправлен белый экран на `gh-pages`: в корень ветки положены production-артефакты из `dist`.
-- Обновлен `index.html`: теперь он ссылается на собранный бандл (`/org-structure-frontend/assets/...`), а не на `/src/main.tsx`.
-- Добавлены отсутствующие файлы бандла в `assets` и обновлен `sw.js` под актуальный набор ресурсов.
+- Восстановлен ранее рабочий runtime-механизм в `gh-pages`: `index.html` снова читает `localStorage` ключи `rip.apiOrigin` и `rip.minioBase` и выставляет `window.__RUNTIME_API_ORIGIN__` и `window.__RUNTIME_MINIO_BASE__` до загрузки приложения.
+- Возвращен совместимый `sw.js`, который кеширует те же asset-хэши, что и `index.html` (`index-DQcu897t.js`, `index-DOqCYXU6.css`).
 
 ## Почему
-- Ошибка `main.tsx 404` означала, что GitHub Pages отдавал dev-страницу Vite вместо собранного фронтенда.
-- Для `gh-pages` ветки нужно публиковать статические файлы сборки, иначе браузер запрашивает несуществующие исходники.
+- После перехода на другой набор production-файлов пропал bootstrap-скрипт с runtime-переопределением API origin через `localStorage`, поэтому ваш прежний способ перестал работать.
 
 ## Риски/ограничения
-- После замены корневого `index.html` на production-версию команда `npm run build` в этой же ветке не предназначена для запуска (это deploy-ветка со статикой).
-- Разработка и сборка должны идти в основной ветке (`lab8-tauri-pwa`/`main`), а в `gh-pages` должен попадать только результат `dist`.
+- Если позже снова публиковать `gh-pages` из нового `dist`, нужно сохранять runtime-bootstrap в `index.html`, иначе локальный override снова пропадет.
 
 ## Как проверить (команды/шаги)
-1. Закоммитить и запушить изменения ветки `gh-pages`.
-2. Открыть сайт на GitHub Pages и сделать hard refresh (`Ctrl+F5`).
-3. В DevTools убедиться, что нет `404` на `main.tsx` и `vite.svg`.
-4. Проверить, что грузятся `assets/index-*.js`, `assets/index-*.css`, и приложение рендерится без белого экрана.
+1. В консоли страницы выполнить:
+   `localStorage.setItem("rip.apiOrigin","http://localhost:8080"); localStorage.setItem("rip.minioBase","http://localhost:9000/test"); location.reload();`
+2. После перезагрузки проверить в DevTools Network, что запросы идут на `http://localhost:8080/api/...`.
+3. Если нужно вернуть поведение по умолчанию:
+   `localStorage.removeItem("rip.apiOrigin"); localStorage.removeItem("rip.minioBase"); location.reload();`
