@@ -5,6 +5,7 @@
 - Прогнан postbuild-патч для runtime API origin: новый `assets/index-Dj8WdEig.js` читает `window.__RUNTIME_API_ORIGIN__`.
 - Добавлен `runtime-config.json` и сохранен override через `localStorage`: в `index.html` сначала берется `localStorage["rip.apiOrigin"]`, и только если ключ пустой — fallback к `runtime-config.json`.
 - Исправлен белый экран из-за путей: в `index.html` ссылки на `vite.svg`, `manifest.webmanifest`, JS/CSS бандл переведены на относительные (`vite.svg`, `assets/...`) вместо жестко зашитого `/org-structure-frontend/...`.
+- Исправлен синтаксис в `assets/index-Dj8WdEig.js` (лишняя `)` в runtime-патче API origin), из-за чего падал `Unexpected token ')'` и страница не рендерилась.
 
 ## Почему
 - Нужно было одновременно: отдать свежий фронтенд из `lab8-tauri-pwa` и не потерять ваш привычный runtime override API через консоль.
@@ -21,3 +22,4 @@
 3. Если нужно вернуть поведение по умолчанию:
    `localStorage.removeItem("rip.apiOrigin"); location.reload();`
 4. Если белый экран остается: DevTools → Application → Service Workers → Unregister + Clear storage, затем `Ctrl+F5`.
+5. Проверка синтаксиса бандла локально: `node --check assets/index-Dj8WdEig.js` (должно быть без ошибок).
