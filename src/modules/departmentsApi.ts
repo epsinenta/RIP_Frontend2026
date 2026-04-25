@@ -1,8 +1,17 @@
 import { publicApiAxios } from "./apiAxios";
 
-const MINIO_PUBLIC_BASE =
-  (import.meta.env.VITE_MINIO_PUBLIC_BASE?.replace(/\/$/, "") as string | undefined) ??
-  "http://localhost:9000/test";
+function resolveMinioBase(): string {
+  const runtime =
+    (typeof window !== "undefined" &&
+    "__RUNTIME_MINIO_BASE__" in window &&
+    typeof (window as Window & { __RUNTIME_MINIO_BASE__?: string }).__RUNTIME_MINIO_BASE__ === "string"
+      ? (window as Window & { __RUNTIME_MINIO_BASE__?: string }).__RUNTIME_MINIO_BASE__
+      : "") || "";
+  const env = (import.meta.env.VITE_MINIO_PUBLIC_BASE as string | undefined) ?? "";
+  return (runtime || env).replace(/\/$/, "") || "http://localhost:9000/test";
+}
+
+const MINIO_PUBLIC_BASE = resolveMinioBase();
 
 export interface Department {
   department_id: number;
